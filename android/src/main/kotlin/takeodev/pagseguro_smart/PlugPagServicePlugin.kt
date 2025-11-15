@@ -62,6 +62,7 @@ class PlugPagServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     /** Recebe chamadas do Dart e redireciona */
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            "isAuthenticated" -> pinPadManager.isAuthenticated(result)
             "initPinPad" -> pinPadManager.initPinPad(call, result)
             "getUserData" -> pinPadManager.getUserData(result)
             "getSerialNumber" -> pinPadManager.getSerialNumber(result)

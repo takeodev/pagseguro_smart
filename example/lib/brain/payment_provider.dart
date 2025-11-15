@@ -51,6 +51,38 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // VERIFICA AUTENTICAÇÃO DO PINPAD
+  // ============================================================
+  Future<void> isAuthenticated() async {
+    if (isTapped) return;
+    isTapped = true;
+
+    String message = 'Verificando PinPad...';
+    displayMessage = message;
+    isActivated = false;
+    isLoading = true;
+    notifyListeners();
+
+    BotToast.showText(text: message);
+
+    try {
+      final result = await pagSeguro.isAuthenticated();
+      message = result['message'] ?? '';
+      isActivated = result['success'];
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      message = 'Erro ao Verificar PinPad!';
+      displayMessage = '$message\n$e';
+      BotToast.showText(text: message);
+    } finally {
+      isLoading = false;
+      isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
   // ATIVAR PINPAD
   // ============================================================
   Future<void> activatePinPad(String code) async {

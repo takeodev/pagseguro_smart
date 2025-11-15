@@ -95,18 +95,32 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 
 ## 🔌 Inicialização
 
-### Ativando o PinPad
+### Verificando se PinPad está Autenticado
 
 ```dart
 final PagSeguroService pagSeguro = PagSeguroService();
 
-Future<void> ativarPinPad(String codigoAtivacao) async {
+Future<void> isAuthenticated() async {
+  final result = await pagSeguro.isAuthenticated();
+
+  if (result['success']) {
+    print('PinPad Autenticado!');
+  } else {
+    print('${result['message']}');
+  }
+}
+```
+
+### Ativando o PinPad
+
+```dart
+Future<void> initPinPad(String codigoAtivacao) async {
   final result = await pagSeguro.initPinPad(codigoAtivacao);
 
   if (result['success']) {
-    print('PinPad ativado!');
+    print('PinPad Ativado!');
   } else {
-    print('Erro: ${result['message']}');
+    print('${result['message']}');
   }
 }
 ```

@@ -14,6 +14,7 @@ import kotlinx.coroutines.CoroutineScope
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagActivationData
 import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagActivationListener
+import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagIsActivatedListener
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagUserDataResult
@@ -31,13 +32,62 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     private val logger = Logger(TAG)
 
+    /** Verifica se PinPad foi Autenticado **/
+    fun isAuthenticated(result: MethodChannel.Result) {
+        try {
+            plugPag.asyncIsAuthenticated(
+                object : PlugPagIsActivatedListener {
+                    override fun onIsActivated(isActivated: Boolean) {
+                        CoroutineHelper.launchMain(scope) {
+                            if (isActivated) {
+                                logger.info("isAuthenticated (onIsActivated, isActivated == true)", "PinPad Autenticado")
+                                result.success(mapOf(
+                                    "success" to true,
+                                    "message" to "PinPad Autenticado!",
+                                    "data" to null
+                                ))
+                            } else {
+                                logger.info("isAuthenticated (onIsActivated, isActivated == false)", "PinPad Não Autenticado")
+                                result.success(mapOf(
+                                    "success" to false,
+                                    "message" to "PinPad Não Autenticado!",
+                                    "data" to null
+                                ))
+                            }
+                        }
+                    }
+
+                    override fun onError(errorMessage: String) {
+                        CoroutineHelper.launchMain(scope) {
+                            logger.error("isAuthenticated (onError)", "Erro na Autenticação: $errorMessage")
+                            result.success(mapOf(
+                                "success" to false,
+                                "message" to "$errorMessage",
+                                "data" to null
+                            ))
+                        }
+                    }
+                }
+            )
+        } catch (e: Exception) {
+            CoroutineHelper.launchMain(scope) {
+                logger.error("isAuthenticated (Exception)", "Erro ao Autenticar PinPad: ${e.message}")
+                result.success(mapOf(
+                    "success" to false,
+                    "message" to "Erro Fatal ao Autenticar PinPad!",
+                    "data" to null
+                ))
+            }
+        }
+    }
+
     /** Inicializa e ativa o PinPad **/
     fun initPinPad(call: MethodCall, result: MethodChannel.Result) {
         try {
             val code = call.argument<String>("activationCode").orEmpty()
 
             if (code.isEmpty()) {
-                logger.warn("code.isEmpty()", "Fornecer Código de Ativação")
+                logger.warn("initPinPad (code.isEmpty())", "Fornecer Código de Ativação")
                 result.success(mapOf(
                     "success" to false,
                     "message" to "Fornecer Código de Ativação",
@@ -53,13 +103,13 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                 object : PlugPagActivationListener {
                     override fun onActivationProgress(eventData: PlugPagEventData) {
                         CoroutineHelper.launchMain(scope) {
-                            logger.info("onActivationProgress", "Ativando PinPad | Id: ${eventData.eventCode} | ${eventData.customMessage}")
+                            logger.info("initPinPad (onActivationProgress)", "Ativando PinPad | Id: ${eventData.eventCode} | ${eventData.customMessage}")
                         }
                     }
 
                     override fun onSuccess(initializationResult: PlugPagInitializationResult) {
                         CoroutineHelper.launchMain(scope) {
-                            logger.info("onSuccess", "PinPad Ativado")
+                            logger.info("initPinPad (onSuccess)", "PinPad Ativado")
                             result.success(mapOf(
                                 "success" to true,
                                 "message" to "PinPad Ativado com Sucesso!",
@@ -70,7 +120,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
                     override fun onError(initializationResult: PlugPagInitializationResult) {
                         CoroutineHelper.launchMain(scope) {
-                            logger.error("onError", "Erro na Ativação | Id: ${initializationResult.errorCode}")
+                            logger.error("initPinPad (onError)", "Erro na Ativação | Id: ${initializationResult.errorCode}")
                             result.success(mapOf(
                                 "success" to false,
                                 "message" to "${initializationResult.errorMessage} (${initializationResult.errorCode})",
@@ -82,7 +132,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
             )
         } catch (e: Exception) {
             CoroutineHelper.launchMain(scope) {
-                logger.error("doPayment (Exception)", "Erro ao Ativar PinPad: ${e.message}")
+                logger.error("initPinPad (Exception)", "Erro ao Ativar PinPad: ${e.message}")
                 result.success(mapOf(
                     "success" to false,
                     "message" to "Erro Fatal ao Ativar PinPad!",

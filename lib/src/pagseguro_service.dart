@@ -92,6 +92,10 @@ class PagSeguroService {
     }
   }
 
+  /// Verifica se PinPad está Ativo
+  Future<Map<String, dynamic>> isAuthenticated() =>
+      _invokeNative('isAuthenticated');
+
   /// Inicializa o PinPad
   Future<Map<String, dynamic>> initPinPad(String activationCode) =>
       _invokeNative('initPinPad', {'activationCode': activationCode});

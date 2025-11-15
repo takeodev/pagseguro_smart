@@ -29,6 +29,16 @@ class _PaymentTabState extends State<PaymentTab> {
   );
 
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final PaymentProvider payProv = context.read<PaymentProvider>();
+      await payProv.isAuthenticated();
+    });
+  }
+
+  @override
   void dispose() {
     activationCodeController.dispose();
     moneyController.dispose();
