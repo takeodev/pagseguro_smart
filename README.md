@@ -1,6 +1,9 @@
 # pagseguro_smart
 
-[![pub package](https://img.shields.io/pub/v/pagseguro_smart.svg)](https://pub.dev/packages/pagseguro_smart)
+[![pub package](https://img.shields.io/pub/v/pagseguro_smart?color=blue)](https://pub.dev/packages/pagseguro_smart)
+[![likes](https://img.shields.io/pub/likes/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
+[![pub points](https://img.shields.io/pub/points/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
+[![popularity](https://img.shields.io/pub/popularity/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
 
 <div align="center">
   <img src="assets/logo_pagseguro.png" alt="PagSeguro" height="80"/>
