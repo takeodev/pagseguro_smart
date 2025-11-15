@@ -3,7 +3,6 @@
 [![pub package](https://img.shields.io/pub/v/pagseguro_smart?color=blue)](https://pub.dev/packages/pagseguro_smart)
 [![likes](https://img.shields.io/pub/likes/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
 [![pub points](https://img.shields.io/pub/points/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
-[![popularity](https://img.shields.io/pub/popularity/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
 
 <div align="center">
   <img src="assets/logo_pagseguro.png" alt="PagSeguro" height="80"/>
@@ -230,9 +229,23 @@ Todos com `fromJsonToModel()` para parse automático.
 - Callbacks dependem do texto da maquininha — o comportamento pode variar por modelo.
 - Recomenda-se testar em dispositivo físico real.
 
+
+---
+
+## ⚖️ Desenvolvedor
+
+<p align="center">
+  <a href="https://github.com/takeodev">
+    <img src="https://avatars.githubusercontent.com/u/50700409?v=4" width="120" height="120">
+  </a>
+  <br>
+  <b>Fernando Takeo Miyaji</b>
+</p>
+
+[https://github.com/takeodev](https://github.com/takeodev)
+
 ---
 
 ## ⚖️ Licença
 
 MIT © 2025 **Fernando Takeo Miyaji**  
-[https://github.com/takeodev](https://github.com/takeodev)
