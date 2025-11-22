@@ -29,7 +29,6 @@ apply plugin: "kotlin-android"
 
 android {
     namespace = "takeodev.pagseguro_smart"
-
     compileSdk = 36
 
     compileOptions {
@@ -47,7 +46,7 @@ android {
     }
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 23
     }
 
     dependencies {

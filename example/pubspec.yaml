@@ -2,7 +2,7 @@ name: example
 description: "Exemplo de Utilização do Plugin em Flutter para integração com o PlugPagServiceWrapper da PagSeguro."
 
 publish_to: 'none'
-version: 1.0.2+2
+version: 1.0.3+3
 
 environment:
   sdk: ^3.9.2
@@ -19,8 +19,8 @@ dependencies:
   mask_text_input_formatter: ^2.9.0
 
 dev_dependencies:
-  integration_test:
-    sdk: flutter
+  #integration_test:
+    #sdk: flutter
   flutter_test:
     sdk: flutter
 
