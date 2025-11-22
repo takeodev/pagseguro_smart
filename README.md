@@ -5,7 +5,9 @@
 [![pub points](https://img.shields.io/pub/points/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
 
 <div align="center">
-  <img src="assets/logo_pagseguro.png" alt="PagSeguro" height="80"/>
+  <a href="https://acesso.pagbank.com.br/portaldev">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Logonovo_pagseguro-cinza.png" alt="PagSeguro" height="80">
+  </a>
 </div>
 
 ---
@@ -17,28 +19,28 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
 
 ---
 
-## 📘 Sumário
+## <span id="sumario"></span> 📘 Sumário
 
-- [Sobre](#-sobre)
-- [Instalação](#-instalação)
-- [Configuração Android](#-configuração-android)
-    - [Permissões](#1️⃣-permissão-necessária)
-    - [Intent-Filter](#2️⃣-intent-filter)
-    - [Ajustar minSdk / targetSdk](#3️⃣-ajustar-minsdk--targetsdk)
-- [Uso](#-uso)
-    - [Inicialização](#inicialização)
+- [Sobre](#sobre)
+- [Instalação](#instalacao)
+- [Configuração Android](#configuracao-android)
+    - [Permissões](#permissoes)
+    - [Intent-Filter](#intent-filter)
+    - [Ajustar minSdk / targetSdk](#ajustar-minsdk-targetsdk)
+- [Uso](#uso)
+    - [Inicialização](#inicializacao)
     - [Pagamentos](#pagamentos)
     - [Estorno](#estorno)
-    - [Reimpressão & Recibos](#reimpressão--recibos)
+    - [Reimpressão & Recibos](#reimpressao-recibos)
     - [Callbacks](#callbacks)
-- [Constantes](#-constantes)
-- [Models](#-models)
-- [Notas Importantes](#-notas-importantes)
-- [Licença](#-licença)
+- [Constantes](#constantes)
+- [Models](#models)
+- [Notas Importantes](#notas-importantes)
+- [Licença](#licenca)
 
 ---
 
-## 🎯 Sobre
+## <span id="sobre"></span> 🎯 Sobre
 
 O objetivo do plugin é oferecer uma interface simples, segura e moderna para comunicação com o SDK **PagSeguro PlugPagServiceWrapper** diretamente de projetos Flutter.
 
@@ -46,7 +48,7 @@ Compatível apenas com máquinas POS Smart **P2 A7**, **P2 A11** e **GPOS A11**.
 
 ---
 
-## 📦 Instalação
+## <span id="instalacao"></span> 📦 Instalação
 
 No `pubspec.yaml`:
 
@@ -63,9 +65,9 @@ flutter pub get
 
 ---
 
-## ⚙️ Configuração Android
+## <span id="configuracao-android"></span> ⚙️ Configuração Android
 
-### 1️⃣ Permissão necessária
+### <span id="1-permissao-necessaria"></span> 1️⃣ Permissão necessária
 
 Adicione ao `AndroidManifest.xml`:
 
@@ -73,7 +75,7 @@ Adicione ao `AndroidManifest.xml`:
 <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS"/>
 ```
 
-### 2️⃣ Intent-Filter
+### <span id="2-intent-filter"></span> 2️⃣ Intent-Filter
 
 Dentro da `<activity>` principal:
 
@@ -86,13 +88,13 @@ Dentro da `<activity>` principal:
 
 ---
 
-### 3️⃣ Ajustar minSdk / targetSdk
+### <span id="3-ajustar-minsdk-targetsdk"></span> 3️⃣ Ajustar minSdk / targetSdk
 
 A PagSeguro exige **Assinatura V1 + V2**, que requer configurar o projeto para aceitar **minSdkVersion 23**:
 
 ---
 
-### 📍 **1. Editar `android/local.properties`**
+### <span id="1-editar-androidlocalproperties"></span> 📍 **1. Editar `android/local.properties`**
 
 Adicione:
 
@@ -105,13 +107,13 @@ flutter.targetSdkVersion=28
 
 ---
 
-## 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
+## <span id="2-editar-androidappbuildgradlekts-kotlin-ou-buildgradle-groovy"></span> 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
 
 Para permitir que o app ajuste automaticamente o **minSdkVersion** e **targetSdkVersion** usando o arquivo `local.properties`, siga as instruções conforme o tipo do seu arquivo Gradle.
 
 ---
 
-### 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
+### <span id="se-voce-usa-kotlin-dsl-buildgradlekts"></span> 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
 
 Adicione **no topo do arquivo**:
 
@@ -142,7 +144,7 @@ android {
 
 ---
 
-### 🟧 **Se você usa Groovy DSL (`build.gradle`)**
+### <span id="se-voce-usa-groovy-dsl-buildgradle"></span> 🟧 **Se você usa Groovy DSL (`build.gradle`)**
 
 Adicione **no topo do arquivo**:
 
@@ -178,9 +180,9 @@ Isso permite que seu app use automaticamente os valores do `local.properties`.
 
 ---
 
-## 🚀 Uso
+## <span id="uso"></span> 🚀 Uso
 
-### Importação
+### <span id="importacao"></span> Importação
 
 ```dart
 import 'package:pagseguro_smart/pagseguro_smart.dart';
@@ -188,9 +190,9 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 
 ---
 
-## 🔌 Inicialização
+## <span id="inicializacao"></span> 🔌 Inicialização
 
-### Verificando se PinPad está Autenticado
+### <span id="verificando-se-pinpad-esta-autenticado"></span> Verificando se PinPad está Autenticado
 
 ```dart
 final PagSeguroService pagSeguro = PagSeguroService();
@@ -206,7 +208,7 @@ Future<void> isAuthenticated() async {
 }
 ```
 
-### Ativando o PinPad
+### <span id="ativando-o-pinpad"></span> Ativando o PinPad
 
 ```dart
 Future<void> initPinPad(String codigoAtivacao) async {
@@ -222,7 +224,7 @@ Future<void> initPinPad(String codigoAtivacao) async {
 
 ---
 
-## 💳 Pagamentos
+## <span id="pagamentos"></span> 💳 Pagamentos
 
 ```dart
 final result = await pagSeguro.doPayment(
@@ -242,7 +244,7 @@ if (result['success']) {
 
 ---
 
-## ⛔ Estorno
+## <span id="estorno"></span> ⛔ Estorno
 
 ```dart
 final estorno = await pagSeguro.voidPayment(
@@ -255,7 +257,7 @@ final estorno = await pagSeguro.voidPayment(
 
 ---
 
-## 🧾 Reimpressão & Recibos
+## <span id="reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
 
 Reimprimir via **Cliente**:
 
@@ -280,7 +282,7 @@ await pagSeguro.sendReceiptSMS(
 
 ---
 
-## 📡 Callbacks
+## <span id="callbacks"></span> 📡 Callbacks
 
 O plugin envia mensagens de progresso durante o pagamento, recomendado colocar no **initState**:
 
@@ -301,26 +303,26 @@ void initState() {
 
 ---
 
-## 🔧 Constantes
+## <span id="constantes"></span> 🔧 Constantes
 
-### Tipos de Pagamento
+### <span id="tipos-de-pagamento"></span> Tipos de Pagamento
 - `PagSeguroType.credit`
 - `PagSeguroType.debit`
 - `PagSeguroType.pix`
 - `PagSeguroType.voucher`
 
-### Parcelamento
+### <span id="parcelamento"></span> Parcelamento
 - `PagSeguroInstallment.singlePay`
 - `PagSeguroInstallment.forMerchant`
 - `PagSeguroInstallment.forCustomer`
 
-### Estorno
+### <span id="estorno"></span> Estorno
 - `PagSeguroVoid.common`
 - `PagSeguroVoid.qrCode`
 
 ---
 
-## 📄 Models
+## <span id="models"></span> 📄 Models
 
 Inclui:
 
@@ -331,7 +333,7 @@ Todos com `fromJsonToModel()` para parse automático.
 
 ---
 
-## 📝 Notas Importantes
+## <span id="notas-importantes"></span> 📝 Notas Importantes
 
 - O plugin funciona **somente** em Android.
 - A maquininha deve estar vinculada a um **usuário ativo** na PagSeguro e com o aplicativo configurado (salvo maquininha debug).
@@ -341,7 +343,7 @@ Todos com `fromJsonToModel()` para parse automático.
 
 ---
 
-## ⚖️ Desenvolvedor
+## <span id="desenvolvedor"></span> ⚖️ Desenvolvedor
 
 <p align="center">
   <a href="https://github.com/takeodev">
@@ -355,6 +357,6 @@ Todos com `fromJsonToModel()` para parse automático.
 
 ---
 
-## ⚖️ Licença
+## <span id="licenca"></span> ⚖️ Licença
 
 MIT © 2025 **Fernando Takeo Miyaji**  

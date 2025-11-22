@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.0.6+6
+
+- [Improve] Atualizado Hiperlinks de Sumário e Logotipo PagSeguro no README.
+
 ## 1.0.5+5
 
 - [Downgrade] app\build.gradle, minSdk (24 => 23) - Pré-requisito PagSeguro para Assinatura V1.
