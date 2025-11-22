@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.0.7+7
+
+- [Improve] Atualizado Hiperlinks de Segundo e Terceiro Nível de Sumário.
+
 ## 1.0.6+6
 
 - [Improve] Atualizado Hiperlinks de Sumário e Logotipo PagSeguro no README.

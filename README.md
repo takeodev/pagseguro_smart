@@ -24,16 +24,26 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
 - [Sobre](#sobre)
 - [Instalação](#instalacao)
 - [Configuração Android](#configuracao-android)
-    - [Permissões](#permissoes)
-    - [Intent-Filter](#intent-filter)
-    - [Ajustar minSdk / targetSdk](#ajustar-minsdk-targetsdk)
+    - [Permissões](#1-permissoes)
+    - [Intent-Filter](#2-intent-filter)
+    - [Ajustar minSdk / targetSdk](#3-ajustar-minsdk-targetsdk)
+      - [Editar "android/local.properties"](#3-1-localproperties)
+      - [Editar "android/app/build.gradle.kts" (Kotlin) ou "build.gradle" (Groovy)](#3-2-buildgradle)
+      - [Se você usa Kotlin DSL (build.gradle.kts)](#3-2-1-kotlin-dsl)
+      - [Se você usa Groovy DSL (build.gradle)](#3-2-2-groovy-dsl)
 - [Uso](#uso)
-    - [Inicialização](#inicializacao)
-    - [Pagamentos](#pagamentos)
-    - [Estorno](#estorno)
-    - [Reimpressão & Recibos](#reimpressao-recibos)
-    - [Callbacks](#callbacks)
+    - [Importação](#0-importacao)
+    - [Inicialização](#1-inicializacao)
+      - [Verificando se PinPad está Autenticado](#1-1-verificando-pinpad)
+      - [Ativando o PinPad](#1-2-ativando-pinpad)
+    - [Pagamentos](#2-pagamentos)
+    - [Estorno](#3-estorno)
+    - [Reimpressão & Recibos](#4-reimpressao-recibos)
+    - [Callbacks](#5-callbacks)
 - [Constantes](#constantes)
+  - [Tipos de Pagamento](#1-tipos-de-pagamento)
+  - [Parcelamento](#2-parcelamento)
+  - [Estorno](#3-estorno)
 - [Models](#models)
 - [Notas Importantes](#notas-importantes)
 - [Licença](#licenca)
@@ -94,7 +104,7 @@ A PagSeguro exige **Assinatura V1 + V2**, que requer configurar o projeto para a
 
 ---
 
-### <span id="1-editar-androidlocalproperties"></span> 📍 **1. Editar `android/local.properties`**
+### <span id="3-1-localproperties"></span> 📍 **1. Editar `android/local.properties`**
 
 Adicione:
 
@@ -107,13 +117,13 @@ flutter.targetSdkVersion=28
 
 ---
 
-## <span id="2-editar-androidappbuildgradlekts-kotlin-ou-buildgradle-groovy"></span> 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
+## <span id="3-2-buildgradle"></span> 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
 
 Para permitir que o app ajuste automaticamente o **minSdkVersion** e **targetSdkVersion** usando o arquivo `local.properties`, siga as instruções conforme o tipo do seu arquivo Gradle.
 
 ---
 
-### <span id="se-voce-usa-kotlin-dsl-buildgradlekts"></span> 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
+### <span id="3-2-1-kotlin-dsl"></span> 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
 
 Adicione **no topo do arquivo**:
 
@@ -144,7 +154,7 @@ android {
 
 ---
 
-### <span id="se-voce-usa-groovy-dsl-buildgradle"></span> 🟧 **Se você usa Groovy DSL (`build.gradle`)**
+### <span id="3-2-2-groovy-dsl"></span> 🟧 **Se você usa Groovy DSL (`build.gradle`)**
 
 Adicione **no topo do arquivo**:
 
@@ -182,7 +192,7 @@ Isso permite que seu app use automaticamente os valores do `local.properties`.
 
 ## <span id="uso"></span> 🚀 Uso
 
-### <span id="importacao"></span> Importação
+### <span id="0-importacao"></span> Importação
 
 ```dart
 import 'package:pagseguro_smart/pagseguro_smart.dart';
@@ -190,9 +200,9 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 
 ---
 
-## <span id="inicializacao"></span> 🔌 Inicialização
+## <span id="1-inicializacao"></span> 🔌 Inicialização
 
-### <span id="verificando-se-pinpad-esta-autenticado"></span> Verificando se PinPad está Autenticado
+### <span id="1-1-verificando-pinpad"></span> Verificando se PinPad está Autenticado
 
 ```dart
 final PagSeguroService pagSeguro = PagSeguroService();
@@ -208,7 +218,7 @@ Future<void> isAuthenticated() async {
 }
 ```
 
-### <span id="ativando-o-pinpad"></span> Ativando o PinPad
+### <span id="1-2-ativando-pinpad"></span> Ativando o PinPad
 
 ```dart
 Future<void> initPinPad(String codigoAtivacao) async {
@@ -224,7 +234,7 @@ Future<void> initPinPad(String codigoAtivacao) async {
 
 ---
 
-## <span id="pagamentos"></span> 💳 Pagamentos
+## <span id="2-pagamentos"></span> 💳 Pagamentos
 
 ```dart
 final result = await pagSeguro.doPayment(
@@ -244,7 +254,7 @@ if (result['success']) {
 
 ---
 
-## <span id="estorno"></span> ⛔ Estorno
+## <span id="3-estorno"></span> ⛔ Estorno
 
 ```dart
 final estorno = await pagSeguro.voidPayment(
@@ -257,7 +267,7 @@ final estorno = await pagSeguro.voidPayment(
 
 ---
 
-## <span id="reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
+## <span id="4-reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
 
 Reimprimir via **Cliente**:
 
@@ -282,7 +292,7 @@ await pagSeguro.sendReceiptSMS(
 
 ---
 
-## <span id="callbacks"></span> 📡 Callbacks
+## <span id="5-callbacks"></span> 📡 Callbacks
 
 O plugin envia mensagens de progresso durante o pagamento, recomendado colocar no **initState**:
 
@@ -305,18 +315,18 @@ void initState() {
 
 ## <span id="constantes"></span> 🔧 Constantes
 
-### <span id="tipos-de-pagamento"></span> Tipos de Pagamento
+### <span id="1-tipos-de-pagamento"></span> Tipos de Pagamento
 - `PagSeguroType.credit`
 - `PagSeguroType.debit`
 - `PagSeguroType.pix`
 - `PagSeguroType.voucher`
 
-### <span id="parcelamento"></span> Parcelamento
+### <span id="2-parcelamento"></span> Parcelamento
 - `PagSeguroInstallment.singlePay`
 - `PagSeguroInstallment.forMerchant`
 - `PagSeguroInstallment.forCustomer`
 
-### <span id="estorno"></span> Estorno
+### <span id="3-estorno"></span> Estorno
 - `PagSeguroVoid.common`
 - `PagSeguroVoid.qrCode`
 
