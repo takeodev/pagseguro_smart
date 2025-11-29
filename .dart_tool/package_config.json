@@ -165,8 +165,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.10.0",
+  "generatorVersion": "3.10.1",
   "flutterRoot": "file:///C:/src/flutter/stable",
-  "flutterVersion": "3.38.1",
+  "flutterVersion": "3.38.3",
   "pubCache": "file:///C:/Users/Takeo/AppData/Local/Pub/Cache"
 }
