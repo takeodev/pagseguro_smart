@@ -14,5 +14,21 @@ Exemplo de integração com o pacote `pagseguro_smart`.
 2. Altere o código de ativação no campo inicial.
 3. Execute o app em modo release (`flutter run --release`).
 
-## Autor
-Fernando Takeo Miyaji
+---
+
+## 👨‍💻 Desenvolvedor
+
+<p align="center">
+  <a href="https://www.takeodev.com/">
+    <img src="https://www.takeodev.com/files/foto_takeo.png" width="120" height="120">
+  </a>
+  <br>
+  <b>Fernando Takeo Miyaji</b>
+</p>
+
+---
+
+## ⭐ Contribuições
+
+Pull Requests são sempre Bem Vindos!  
+Se você gostou desse package, considere dar um *Like* no **pub.dev** ou no **[GitHub](https://github.com/takeodev)**.

@@ -5,8 +5,8 @@
 [![pub points](https://img.shields.io/pub/points/pagseguro_smart)](https://pub.dev/packages/pagseguro_smart/score)
 
 <div align="center">
-  <a href="https://acesso.pagbank.com.br/portaldev">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/29/Logonovo_pagseguro-cinza.png" alt="PagSeguro" height="80">
+  <a href="https://www.takeodev.com/">
+    <img src="https://www.takeodev.com/files/logo_takeo.png" alt="Desenvolvedor Takeo" height="80">
   </a>
 </div>
 
@@ -21,36 +21,38 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
 
 ## <span id="sumario"></span> 📘 Sumário
 
-- [Sobre](#sobre)
-- [Instalação](#instalacao)
-- [Configuração Android](#configuracao-android)
-    - [Permissões](#1-permissoes)
-    - [Intent-Filter](#2-intent-filter)
-    - [Ajustar minSdk / targetSdk](#3-ajustar-minsdk-targetsdk)
-      - [Editar "android/local.properties"](#3-1-localproperties)
-      - [Editar "android/app/build.gradle.kts" (Kotlin) ou "build.gradle" (Groovy)](#3-2-buildgradle)
-      - [Se você usa Kotlin DSL (build.gradle.kts)](#3-2-1-kotlin-dsl)
-      - [Se você usa Groovy DSL (build.gradle)](#3-2-2-groovy-dsl)
-- [Uso](#uso)
-    - [Importação](#0-importacao)
-    - [Inicialização](#1-inicializacao)
-      - [Verificando se PinPad está Autenticado](#1-1-verificando-pinpad)
-      - [Ativando o PinPad](#1-2-ativando-pinpad)
-    - [Pagamentos](#2-pagamentos)
-    - [Estorno](#3-estorno)
-    - [Reimpressão & Recibos](#4-reimpressao-recibos)
-    - [Callbacks](#5-callbacks)
-- [Constantes](#constantes)
-  - [Tipos de Pagamento](#1-tipos-de-pagamento)
-  - [Parcelamento](#2-parcelamento)
-  - [Estorno](#3-estorno)
-- [Models](#models)
-- [Notas Importantes](#notas-importantes)
-- [Licença](#licenca)
+- [Sobre](#1-sobre)
+- [Instalação](#2-instalacao)
+- [Configuração Android](#3-configuracao)
+  - [Permissões](#3-1-permissoes)
+  - [Intent-Filter](#3-2-intent-filter)
+  - [Ajustar minSdk / targetSdk](#3-3-sdk)
+    - [Editar "android/local.properties"](#3-3-1-localproperties)
+    - [Editar "android/app/build.gradle.kts" (Kotlin) ou "build.gradle" (Groovy)](#3-3-2-buildgradle)
+      - [Se você usa Kotlin DSL (build.gradle.kts)](#3-3-2-1-kotlin-dsl)
+      - [Se você usa Groovy DSL (build.gradle)](#3-3-2-2-groovy-dsl)
+- [Como Utilizar](#4-uso)
+  - [Importação](#4-1-importacao)
+  - [Inicialização](#4-2-inicializacao)
+    - [Verificando se PinPad está Autenticado](#4-2-1-verificando-pinpad)
+    - [Ativando o PinPad](#4-2-2-ativando-pinpad)
+  - [Pagamentos](#4-3-pagamentos)
+  - [Estorno](#4-4-estorno)
+  - [Reimpressão & Recibos](#4-5-reimpressao-recibos)
+  - [Callbacks](#4-6-callbacks)
+- [Constantes](#5-constantes)
+  - [Tipos de Pagamento](#5-1-tipos-de-pagamento)
+  - [Parcelamento](#5-2-parcelamento)
+  - [Estorno](#5-3-estorno)
+- [Models](#6-models)
+- [Notas Importantes](#7-notas-importantes)
+- [Desenvolvedor](#8-desenvolvedor)
+- [Licença](#9-licenca)
+- [Contribuições](#10-contribuicao)
 
 ---
 
-## <span id="sobre"></span> 🎯 Sobre
+## <span id="1-sobre"></span> 🎯 Sobre
 
 O objetivo do plugin é oferecer uma interface simples, segura e moderna para comunicação com o SDK **PagSeguro PlugPagServiceWrapper** diretamente de projetos Flutter.
 
@@ -58,7 +60,7 @@ Compatível apenas com máquinas POS Smart **P2 A7**, **P2 A11** e **GPOS A11**.
 
 ---
 
-## <span id="instalacao"></span> 📦 Instalação
+## <span id="2-instalacao"></span> 📦 Instalação
 
 No `pubspec.yaml`:
 
@@ -75,9 +77,9 @@ flutter pub get
 
 ---
 
-## <span id="configuracao-android"></span> ⚙️ Configuração Android
+## <span id="3-configuracao"></span> ⚙️ Configuração Android
 
-### <span id="1-permissao-necessaria"></span> 1️⃣ Permissão necessária
+### <span id="3-1-permissoes"></span> 1️⃣ Permissão necessária
 
 Adicione ao `AndroidManifest.xml`:
 
@@ -85,8 +87,8 @@ Adicione ao `AndroidManifest.xml`:
 <uses-permission android:name="br.com.uol.pagseguro.permission.MANAGE_PAYMENTS"/>
 ```
 
-### <span id="2-intent-filter"></span> 2️⃣ Intent-Filter
-
+### <span id="3-2-intent-filter"></span> 2️⃣ Intent-Filter
+ 
 Dentro da `<activity>` principal:
 
 ```xml
@@ -98,13 +100,13 @@ Dentro da `<activity>` principal:
 
 ---
 
-### <span id="3-ajustar-minsdk-targetsdk"></span> 3️⃣ Ajustar minSdk / targetSdk
+### <span id="3-3-sdk"></span> 3️⃣ Ajustar minSdk / targetSdk
 
 A PagSeguro exige **Assinatura V1 + V2**, que requer configurar o projeto para aceitar **minSdkVersion 23**:
 
 ---
 
-### <span id="3-1-localproperties"></span> 📍 **1. Editar `android/local.properties`**
+### <span id="3-3-1-localproperties"></span> 📍 **1. Editar `android/local.properties`**
 
 Adicione:
 
@@ -117,13 +119,13 @@ flutter.targetSdkVersion=28
 
 ---
 
-## <span id="3-2-buildgradle"></span> 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
+## <span id="3-3-2-buildgradle"></span> 📍 **2. Editar `android/app/build.gradle.kts` (Kotlin) ou `build.gradle` (Groovy)**
 
 Para permitir que o app ajuste automaticamente o **minSdkVersion** e **targetSdkVersion** usando o arquivo `local.properties`, siga as instruções conforme o tipo do seu arquivo Gradle.
 
 ---
 
-### <span id="3-2-1-kotlin-dsl"></span> 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
+### <span id="3-3-2-1-kotlin-dsl"></span> 🟦 **Se você usa Kotlin DSL (`build.gradle.kts`)**
 
 Adicione **no topo do arquivo**:
 
@@ -154,7 +156,7 @@ android {
 
 ---
 
-### <span id="3-2-2-groovy-dsl"></span> 🟧 **Se você usa Groovy DSL (`build.gradle`)**
+### <span id="3-3-2-2-groovy-dsl"></span> 🟧 **Se você usa Groovy DSL (`build.gradle`)**
 
 Adicione **no topo do arquivo**:
 
@@ -190,9 +192,9 @@ Isso permite que seu app use automaticamente os valores do `local.properties`.
 
 ---
 
-## <span id="uso"></span> 🚀 Uso
+## <span id="4-uso"></span> 🚀 Como Utilizar
 
-### <span id="0-importacao"></span> Importação
+### <span id="4-1-importacao"></span> Importação
 
 ```dart
 import 'package:pagseguro_smart/pagseguro_smart.dart';
@@ -200,9 +202,9 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 
 ---
 
-## <span id="1-inicializacao"></span> 🔌 Inicialização
+## <span id="4-2-inicializacao"></span> 🔌 Inicialização
 
-### <span id="1-1-verificando-pinpad"></span> Verificando se PinPad está Autenticado
+### <span id="4-2-1-verificando-pinpad"></span> Verificando se PinPad está Autenticado
 
 ```dart
 final PagSeguroService pagSeguro = PagSeguroService();
@@ -218,7 +220,7 @@ Future<void> isAuthenticated() async {
 }
 ```
 
-### <span id="1-2-ativando-pinpad"></span> Ativando o PinPad
+### <span id="4-2-2-ativando-pinpad"></span> Ativando o PinPad
 
 ```dart
 Future<void> initPinPad(String codigoAtivacao) async {
@@ -234,7 +236,7 @@ Future<void> initPinPad(String codigoAtivacao) async {
 
 ---
 
-## <span id="2-pagamentos"></span> 💳 Pagamentos
+## <span id="4-3-pagamentos"></span> 💳 Pagamentos
 
 ```dart
 final result = await pagSeguro.doPayment(
@@ -254,7 +256,7 @@ if (result['success']) {
 
 ---
 
-## <span id="3-estorno"></span> ⛔ Estorno
+## <span id="4-4-estorno"></span> ⛔ Estorno
 
 ```dart
 final estorno = await pagSeguro.voidPayment(
@@ -267,7 +269,7 @@ final estorno = await pagSeguro.voidPayment(
 
 ---
 
-## <span id="4-reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
+## <span id="4-5-reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
 
 Reimprimir via **Cliente**:
 
@@ -292,7 +294,7 @@ await pagSeguro.sendReceiptSMS(
 
 ---
 
-## <span id="5-callbacks"></span> 📡 Callbacks
+## <span id="4-6-callbacks"></span> 📡 Callbacks
 
 O plugin envia mensagens de progresso durante o pagamento, recomendado colocar no **initState**:
 
@@ -313,26 +315,26 @@ void initState() {
 
 ---
 
-## <span id="constantes"></span> 🔧 Constantes
+## <span id="5-constantes"></span> 🔧 Constantes
 
-### <span id="1-tipos-de-pagamento"></span> Tipos de Pagamento
+### <span id="5-1-tipos-de-pagamento"></span> Tipos de Pagamento
 - `PagSeguroType.credit`
 - `PagSeguroType.debit`
 - `PagSeguroType.pix`
 - `PagSeguroType.voucher`
 
-### <span id="2-parcelamento"></span> Parcelamento
+### <span id="5-2-parcelamento"></span> Parcelamento
 - `PagSeguroInstallment.singlePay`
 - `PagSeguroInstallment.forMerchant`
 - `PagSeguroInstallment.forCustomer`
 
-### <span id="3-estorno"></span> Estorno
+### <span id="5-3-estorno"></span> Estorno
 - `PagSeguroVoid.common`
 - `PagSeguroVoid.qrCode`
 
 ---
 
-## <span id="models"></span> 📄 Models
+## <span id="6-models"></span> 📄 Models
 
 Inclui:
 
@@ -343,30 +345,34 @@ Todos com `fromJsonToModel()` para parse automático.
 
 ---
 
-## <span id="notas-importantes"></span> 📝 Notas Importantes
+## <span id="7-notas-importantes"></span> 📝 Notas Importantes
 
 - O plugin funciona **somente** em Android.
 - A maquininha deve estar vinculada a um **usuário ativo** na PagSeguro e com o aplicativo configurado (salvo maquininha debug).
 - Callbacks dependem do texto da maquininha — o comportamento pode variar por modelo.
 - Recomenda-se testar em dispositivo físico real.
 
-
 ---
 
-## <span id="desenvolvedor"></span> ⚖️ Desenvolvedor
+## <span id="8-desenvolvedor"></span> 👨‍💻 Desenvolvedor
 
 <p align="center">
-  <a href="https://github.com/takeodev">
-    <img src="https://avatars.githubusercontent.com/u/50700409?v=4" width="120" height="120">
+  <a href="https://www.takeodev.com/">
+    <img src="https://www.takeodev.com/files/foto_takeo.png" width="120" height="120">
   </a>
   <br>
   <b>Fernando Takeo Miyaji</b>
 </p>
 
-[https://github.com/takeodev](https://github.com/takeodev)
+---
+
+## <span id="9-licenca"></span> ⚖️ Licença
+
+MIT © 2025 **Fernando Takeo Miyaji**
 
 ---
 
-## <span id="licenca"></span> ⚖️ Licença
+## <span id="10-contribuicao"></span> ⭐ Contribuições
 
-MIT © 2025 **Fernando Takeo Miyaji**  
+Pull Requests são sempre Bem Vindos!  
+Se você gostou desse package, considere dar um *Like* no **pub.dev** ou no **[GitHub](https://github.com/takeodev)**.

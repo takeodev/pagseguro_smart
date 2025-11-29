@@ -2,7 +2,7 @@ name: example
 description: "Exemplo de Utilização do Plugin em Flutter para integração com o PlugPagServiceWrapper da PagSeguro."
 
 publish_to: 'none'
-version: 1.0.3+3
+version: 1.0.4
 
 environment:
   sdk: ^3.9.2
