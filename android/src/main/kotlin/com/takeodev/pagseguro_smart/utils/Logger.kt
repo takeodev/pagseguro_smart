@@ -1,4 +1,4 @@
-package takeodev.pagseguro_smart.utils
+package com.takeodev.pagseguro_smart.utils
 
 /** ======================================================================================
 Arquivo         : Logger.kt

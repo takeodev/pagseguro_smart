@@ -53,8 +53,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // VERIFICA AUTENTICAÇÃO DO PINPAD
   // ============================================================
-  Future<void> isAuthenticated() async {
-    if (isTapped) return;
+  Future<bool> isAuthenticated() async {
+    if (isTapped) return false;
     isTapped = true;
 
     String message = 'Verificando PinPad...';
@@ -80,6 +80,7 @@ class PaymentProvider extends ChangeNotifier {
       isTapped = false;
       notifyListeners();
     }
+    return isActivated;
   }
 
   // ============================================================
@@ -196,7 +197,9 @@ class PaymentProvider extends ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
-      message = (result['success'] ?? false) ? 'Cancelado!' : result['message'];
+      message = (result['success'] ?? false)
+          ? 'Transação Cancelada!'
+          : result['message'];
 
       displayMessage = message;
       BotToast.showText(text: message);

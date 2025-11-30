@@ -1,4 +1,4 @@
-package takeodev.pagseguro_smart.utils
+package com.takeodev.pagseguro_smart.utils
 
 /** ======================================================================================
 Arquivo         : CoroutineHelper.kt
@@ -24,7 +24,7 @@ object CoroutineHelper {
         scope.launch(Dispatchers.Default, block = block)
     }
 
-    /** Executa código em Thread de I/O (operações bloqueantes) **/
+    /** Executa código em Thread de I/O (operações bloqueantes, PESADAS (I/O, BD, cálculo, logs grandes) **/
     fun launchIO(scope: CoroutineScope, block: suspend CoroutineScope.() -> Unit) {
         scope.launch(Dispatchers.IO, block = block)
     }

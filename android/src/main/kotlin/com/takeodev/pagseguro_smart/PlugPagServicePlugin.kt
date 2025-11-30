@@ -1,4 +1,4 @@
-package takeodev.pagseguro_smart
+package com.takeodev.pagseguro_smart
 
 /** ======================================================================================
 Arquivo         : PlugPagServicePlugin.kt
@@ -16,9 +16,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPag
-import takeodev.pagseguro_smart.manager.PinPadManager
-import takeodev.pagseguro_smart.manager.PaymentManager
-import takeodev.pagseguro_smart.manager.ReceiptManager
+import com.takeodev.pagseguro_smart.manager.PinPadManager
+import com.takeodev.pagseguro_smart.manager.PaymentManager
+import com.takeodev.pagseguro_smart.manager.ReceiptManager
 
 /**
  * Classe principal do plugin PagSeguro Smart para Flutter.
@@ -62,6 +62,7 @@ class PlugPagServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
     /** Recebe chamadas do Dart e redireciona */
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
+            // Métodos Síncronos
             "isAuthenticated" -> pinPadManager.isAuthenticated(result)
             "initPinPad" -> pinPadManager.initPinPad(call, result)
             "getUserData" -> pinPadManager.getUserData(result)
@@ -75,6 +76,17 @@ class PlugPagServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
             "sendReceiptSMS" -> receiptManager.sendReceiptSMS(call, result)
             "reprintCustomerReceipt" -> receiptManager.reprintCustomerReceipt(result)
             "reprintEstablishmentReceipt" -> receiptManager.reprintEstablishmentReceipt(result)
+
+            // Métodos Assíncronos
+            "asyncIsAuthenticated" -> pinPadManager.asyncIsAuthenticated(result)
+            "asyncInitPinPad" -> pinPadManager.asyncInitPinPad(call, result)
+            "doAsyncPayment" -> paymentManager.doAsyncPayment(call, result)
+            "asyncAbortTransaction" -> paymentManager.asyncAbortTransaction(result)
+            "asyncVoidPayment" -> paymentManager.asyncVoidPayment(call, result)
+            "asyncGetLastTransaction" -> paymentManager.asyncGetLastTransaction(result)
+            "asyncReprintCustomerReceipt" -> receiptManager.asyncReprintCustomerReceipt(result)
+            "asyncReprintEstablishmentReceipt" -> receiptManager.asyncReprintEstablishmentReceipt(result)
+
             else -> result.notImplemented()
         }
     }

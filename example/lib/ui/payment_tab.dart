@@ -19,6 +19,8 @@ class PaymentTab extends StatefulWidget {
 }
 
 class _PaymentTabState extends State<PaymentTab> {
+  bool _isActive = false;
+
   final TextEditingController activationCodeController = TextEditingController(
     text: '749879',
   );
@@ -34,7 +36,8 @@ class _PaymentTabState extends State<PaymentTab> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final PaymentProvider payProv = context.read<PaymentProvider>();
-      await payProv.isAuthenticated();
+      final isActive = await payProv.isAuthenticated();
+      setState(() => _isActive = isActive);
     });
   }
 
@@ -54,7 +57,7 @@ class _PaymentTabState extends State<PaymentTab> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          if (!payProv.isActivated)
+          if (!payProv.isActivated || !_isActive)
             Card(
               elevation: 3,
               child: Padding(
@@ -102,80 +105,84 @@ class _PaymentTabState extends State<PaymentTab> {
             ),
 
           // CARD PAGAMENTO
-          Card(
-            elevation: 3,
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  const Text(
-                    'Pagamento',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  TextField(
-                    enabled: payProv.isActivated && !payProv.isInProgress,
-                    controller: moneyController,
-                    keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'R\$ 0,00',
-                    ),
-                    onChanged: (v) {
-                      if (moneyController.numberValue < 1) {
-                        payProv.displayMessage = 'Valor mínimo R\$1,00';
-                      }
-                    },
-                  ),
-
-                  if (payProv.displayMessage.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.only(top: 12),
-                      child: Text(payProv.displayMessage),
-                    ),
-
-                  if (payProv.isLoading)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 10),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-
-                  const SizedBox(height: 10),
-
-                  if (!payProv.isInProgress)
-                    ElevatedButton.icon(
-                      onPressed: payProv.isActivated
-                          ? () => payProv.doPayment(
-                              context,
-                              moneyController.numberValue,
-                            )
-                          : null,
-                      icon: const Icon(Icons.check_circle),
-                      label: const Text('Realizar Pagamento'),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
+          if (_isActive)
+            Card(
+              elevation: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    const Text(
+                      'Pagamento',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                  const SizedBox(height: 8),
+                    const SizedBox(height: 12),
 
-                  ElevatedButton.icon(
-                    onPressed: payProv.canAbort
-                        ? () => payProv.abortTransaction()
-                        : null,
-                    icon: const Icon(Icons.cancel),
-                    label: const Text('Cancelar Transação'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      minimumSize: const Size(double.infinity, 50),
+                    TextField(
+                      enabled: payProv.isActivated && !payProv.isInProgress,
+                      controller: moneyController,
+                      keyboardType: TextInputType.number,
+                      decoration: const InputDecoration(
+                        border: OutlineInputBorder(),
+                        hintText: 'R\$ 0,00',
+                      ),
+                      onChanged: (v) {
+                        if (moneyController.numberValue < 1) {
+                          payProv.displayMessage = 'Valor mínimo R\$1,00';
+                        }
+                      },
                     ),
-                  ),
-                ],
+
+                    if (payProv.displayMessage.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Text(payProv.displayMessage),
+                      ),
+
+                    if (payProv.isLoading)
+                      const Padding(
+                        padding: EdgeInsets.symmetric(vertical: 10),
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+
+                    const SizedBox(height: 10),
+
+                    if (!payProv.isInProgress)
+                      ElevatedButton.icon(
+                        onPressed: payProv.isActivated
+                            ? () => payProv.doPayment(
+                                context,
+                                moneyController.numberValue,
+                              )
+                            : null,
+                        icon: const Icon(Icons.check_circle),
+                        label: const Text('Realizar Pagamento'),
+                        style: ElevatedButton.styleFrom(
+                          minimumSize: const Size(double.infinity, 50),
+                        ),
+                      ),
+
+                    const SizedBox(height: 8),
+
+                    ElevatedButton.icon(
+                      onPressed: payProv.canAbort
+                          ? () => payProv.abortTransaction()
+                          : null,
+                      icon: const Icon(Icons.cancel),
+                      label: const Text('Cancelar Transação'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.redAccent,
+                        minimumSize: const Size(double.infinity, 50),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
         ],
       ),
     );

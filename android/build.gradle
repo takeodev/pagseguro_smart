@@ -1,4 +1,4 @@
-group = "takeodev.pagseguro_smart"
+group = "com.takeodev.pagseguro_smart"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -28,7 +28,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "takeodev.pagseguro_smart"
+    namespace = "com.takeodev.pagseguro_smart"
     compileSdk = 36
 
     compileOptions {

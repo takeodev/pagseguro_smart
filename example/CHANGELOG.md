@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.5
+
+- [Improve] Autenticação do PinPad ao Iniciar o App.
+
 ## 1.0.4
 
 - [Fix] Versionamento no **pubspec.yaml**.

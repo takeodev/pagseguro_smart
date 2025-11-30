@@ -95,10 +95,14 @@ class PagSeguroService {
   /// Verifica se PinPad está Ativo
   Future<Map<String, dynamic>> isAuthenticated() =>
       _invokeNative('isAuthenticated');
+  Future<Map<String, dynamic>> asyncIsAuthenticated() =>
+      _invokeNative('asyncIsAuthenticated');
 
   /// Inicializa o PinPad
   Future<Map<String, dynamic>> initPinPad(String activationCode) =>
       _invokeNative('initPinPad', {'activationCode': activationCode});
+  Future<Map<String, dynamic>> asyncInitPinPad(String activationCode) =>
+      _invokeNative('asyncInitPinPad', {'activationCode': activationCode});
 
   /// Realiza o pagamento
   Future<Map<String, dynamic>> doPayment({
@@ -117,10 +121,28 @@ class PagSeguroService {
         'userReference': userReference,
         'printReceipt': printReceipt,
       });
+  Future<Map<String, dynamic>> doAsyncPayment({
+    required int type,
+    required double value,
+    int installmentType = PagSeguroInstallment.singlePay,
+    int installments = 1,
+    required String userReference,
+    bool printReceipt = false,
+  }) =>
+      _invokeNative('doAsyncPayment', {
+        'type': type,
+        'amount': value,
+        'installmentType': installmentType,
+        'installments': installments,
+        'userReference': userReference,
+        'printReceipt': printReceipt,
+      });
 
   /// Aborta / cancela transação em andamento
   Future<Map<String, dynamic>> abortTransaction() =>
       _invokeNative('abortTransaction');
+  Future<Map<String, dynamic>> asyncAbortTransaction() =>
+      _invokeNative('asyncAbortTransaction');
 
   /// Realiza o estorno
   Future<Map<String, dynamic>> voidPayment({
@@ -135,10 +157,24 @@ class PagSeguroService {
         'voidType': voidType,
         'printReceipt': printReceipt,
       });
+  Future<Map<String, dynamic>> asyncVoidPayment({
+    required String transactionCode,
+    required String transactionId,
+    int voidType = PagSeguroVoid.common,
+    bool printReceipt = false,
+  }) =>
+      _invokeNative('asyncVoidPayment', {
+        'transactionCode': transactionCode,
+        'transactionId': transactionId,
+        'voidType': voidType,
+        'printReceipt': printReceipt,
+      });
 
   /// Pega os Dados da Última Transação (Pode ser Estorno ou Pagamento)
   Future<Map<String, dynamic>> getLastTransaction() =>
       _invokeNative('getLastTransaction');
+  Future<Map<String, dynamic>> asyncGetLastTransaction() =>
+      _invokeNative('asyncGetLastTransaction');
 
   /// Coleta dados do Dono da Maquininha
   Future<Map<String, dynamic>> getUserData() => _invokeNative('getUserData');
@@ -157,10 +193,14 @@ class PagSeguroService {
   /// Reimpressão de Recibo: Via do Cliente
   Future<Map<String, dynamic>> reprintCustomerReceipt() =>
       _invokeNative('reprintCustomerReceipt');
+  Future<Map<String, dynamic>> asyncReprintCustomerReceipt() =>
+      _invokeNative('asyncReprintCustomerReceipt');
 
   /// Reimpressão de Recibo: Via da Loja
   Future<Map<String, dynamic>> reprintEstablishmentReceipt() =>
       _invokeNative('reprintEstablishmentReceipt');
+  Future<Map<String, dynamic>> asyncReprintEstablishmentReceipt() =>
+      _invokeNative('asyncReprintEstablishmentReceipt');
 
   /// Envia Recibo via SMS
   Future<Map<String, dynamic>> sendReceiptSMS(

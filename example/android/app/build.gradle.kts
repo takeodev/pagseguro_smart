@@ -18,7 +18,7 @@ val minSdkFromLocal = localProps.getProperty("flutter.minSdkVersion")?.toInt() ?
 val targetSdkFromLocal = localProps.getProperty("flutter.targetSdkVersion")?.toInt() ?: 34
 
 android {
-    namespace = "takeodev.pagseguro_smart.example"
+    namespace = "com.takeodev.pagseguro_smart.example"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "takeodev.pagseguro_smart.example"
+        applicationId = "com.takeodev.pagseguro_smart.example"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = minSdkFromLocal
