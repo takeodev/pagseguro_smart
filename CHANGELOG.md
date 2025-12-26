@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.1
+
+- [Add] Método de Pagamento "_tMoney_" em "**Constants** > _PagSeguroEnum_" para Uso Interno.
+
 ## 1.2.0
 
 - [Improve] Em "**Constants**", as classes de identificações de tipo de pagamento, parcelamento e estorno da PagSeguro se tornaram _enum_ com código e descrição.

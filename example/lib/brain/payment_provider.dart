@@ -327,7 +327,7 @@ class PaymentProvider extends ChangeNotifier {
     PagSeguroEnum? payType = await payMethodDialog(context);
 
     try {
-      if (payType == null) {
+      if (payType == null || payType.code == 0) {
         message = 'Cancelado Pagamento';
         displayMessage = message;
         BotToast.showText(text: message);

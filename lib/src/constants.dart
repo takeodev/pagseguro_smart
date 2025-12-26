@@ -28,6 +28,9 @@ class Constants {
 }
 
 enum PagSeguroEnum {
+  /// Tipo de Pagamento não Suportado pela PagSeguro (t = type) para Uso Interno apenas!
+  tMoney(0, 'money'),
+
   /// Tipos de pagamento suportados pela PagSeguro (t = type)
   tCredit(1, 'credit'), // PlugPag.TYPE_CREDITO
   tDebit(2, 'debit'), // PlugPag.TYPE_DEBITO

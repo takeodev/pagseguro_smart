@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.9
+
+- [Add] Segurança contra Método de Pagamento "_tMoney_".
+
 ## 1.0.8
 
 - [Fix] As classes "_PagSeguroType_", "_PagSeguroInstallment_" e "_PagSeguroVoid_" se tornaram enum "_PagSeguroEnum_".
