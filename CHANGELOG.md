@@ -1,8 +1,12 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.3
+
+- [Add] Em "**Constants**" adicionada utilitário "_cardPayments_".
+
 ## 1.2.2
 
-- [Add] Dentro de "**TransactionDataModel**" adicionada funcionalidade "_toJsonString()_".
+- [Add] Em "**TransactionDataModel**" adicionada funcionalidade "_toJsonString()_".
 
 ## 1.2.1
 

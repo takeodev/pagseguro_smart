@@ -27,6 +27,13 @@ class Constants {
   ];
 }
 
+/// Identificador de Tipos de Pagamento com Cartão
+var cardPayments = {
+  PagSeguroEnum.tCredit,
+  PagSeguroEnum.tDebit,
+  PagSeguroEnum.tVoucher,
+};
+
 enum PagSeguroEnum {
   /// Tipo de Pagamento não Suportado pela PagSeguro (t = type) para Uso Interno apenas!
   tMoney(0, 'money'),
