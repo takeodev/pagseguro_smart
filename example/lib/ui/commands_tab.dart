@@ -68,6 +68,25 @@ class CommandsTab extends StatelessWidget {
                         label: const Text('Tema Verde'),
                       ),
                       ElevatedButton.icon(
+                        icon: const Icon(Icons.invert_colors_on),
+                        onPressed:
+                            payProv.isActivated &&
+                                payProv.actualPreset != LayoutPreset.warmSunset
+                            ? () =>
+                                  payProv.setStyleData(LayoutPreset.warmSunset)
+                            : null,
+                        label: const Text('Tema Fogo'),
+                      ),
+                      ElevatedButton.icon(
+                        icon: const Icon(Icons.format_color_text),
+                        onPressed:
+                            payProv.isActivated &&
+                                payProv.actualPreset != LayoutPreset.warmLight
+                            ? () => payProv.setStyleData(LayoutPreset.warmLight)
+                            : null,
+                        label: const Text('Tema Suave'),
+                      ),
+                      ElevatedButton.icon(
                         icon: const Icon(Icons.format_color_fill),
                         onPressed:
                             payProv.isActivated &&

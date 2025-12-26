@@ -1,5 +1,11 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.1.2
+
+- [Add] Segurança com HEX Completo em "**LayoutPresets**".
+- [Add] Layouts Pré-Configurados "**LayoutPreset.warmSunset** & **LayoutPreset.warmLight**".
+- [Improve] Atualizado README.
+
 ## 1.1.1
 
 - [Improve] Verificador de Serviço da PagSeguro (Ocupado ou Livre).

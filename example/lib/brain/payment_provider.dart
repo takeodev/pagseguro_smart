@@ -29,7 +29,7 @@ class PaymentProvider extends ChangeNotifier {
   LayoutPreset actualPreset = LayoutPreset.pagseguroDefault;
   bool askPrint = true;
   bool smsPrint = false;
-  bool printAppName = false;
+  bool printListener = false;
 
   // Dados a Serem Exibidos
   String displayMessage = '';
@@ -243,7 +243,7 @@ class PaymentProvider extends ChangeNotifier {
     try {
       final result = await pagSeguro.isServiceBusy();
       message = result['message']!;
-      isBusy = !(result['data'] ?? true);
+      isBusy = result['data'] ?? true;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
@@ -270,24 +270,24 @@ class PaymentProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
-    final colors = LayoutPresets.presets[layoutPreset]!;
+    final preset = LayoutPresets.presets[layoutPreset]!;
 
     try {
       final result = await pagSeguro.setStyleData(
-        headTextColor: colors['headTextColor']!,
-        headBackgroundColor: colors['headBackgroundColor']!,
-        contentTextColor: colors['contentTextColor']!,
-        contentTextValue1Color: colors['contentTextValue1Color']!,
-        contentTextValue2Color: colors['contentTextValue2Color']!,
-        positiveButtonTextColor: colors['positiveButtonTextColor']!,
-        positiveButtonBackground: colors['positiveButtonBackground']!,
-        negativeButtonTextColor: colors['negativeButtonTextColor']!,
-        negativeButtonBackground: colors['negativeButtonBackground']!,
-        genericButtonBackground: colors['genericButtonBackground']!,
-        genericButtonTextColor: colors['genericButtonTextColor']!,
-        genericSmsEditTextBackground: colors['genericSmsEditTextBackground']!,
-        genericSmsEditTextTextColor: colors['genericSmsEditTextTextColor']!,
-        lineColor: colors['lineColor']!,
+        headTextColor: preset['headTextColor']!,
+        headBackgroundColor: preset['headBackgroundColor']!,
+        contentTextColor: preset['contentTextColor']!,
+        contentTextValue1Color: preset['contentTextValue1Color']!,
+        contentTextValue2Color: preset['contentTextValue2Color']!,
+        positiveButtonTextColor: preset['positiveButtonTextColor']!,
+        positiveButtonBackground: preset['positiveButtonBackground']!,
+        negativeButtonTextColor: preset['negativeButtonTextColor']!,
+        negativeButtonBackground: preset['negativeButtonBackground']!,
+        genericButtonBackground: preset['genericButtonBackground']!,
+        genericButtonTextColor: preset['genericButtonTextColor']!,
+        genericSmsEditTextBackground: preset['genericSmsEditTextBackground']!,
+        genericSmsEditTextTextColor: preset['genericSmsEditTextTextColor']!,
+        lineColor: preset['lineColor']!,
       );
       message = result['message']!;
       actualPreset = layoutPreset;
@@ -605,11 +605,11 @@ class PaymentProvider extends ChangeNotifier {
     try {
       final result = await pagSeguro.setPlugPagCustomPrinterLayout(title);
       message = result['message']!;
-      printAppName = true;
+      printListener = true;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      printAppName = false;
+      printListener = false;
       message = 'Erro ao Definir Estilo do Recibo!';
       displayMessage = '$message\n$e';
     } finally {

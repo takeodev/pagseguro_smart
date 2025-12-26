@@ -20,6 +20,7 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagPrintActionL
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrintActionResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagTransactionResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagCustomPrinterLayout
+import com.takeodev.pagseguro_smart.utils.Util
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
 
@@ -375,33 +376,16 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona **/
     fun setPlugPagCustomPrinterLayout(call: MethodCall, result: MethodChannel.Result) {
-        fun getString(key: String, defaultValue: String): String {
-            return call.argument<String>(key) ?: defaultValue
-        }
-
-        fun getColorString(key: String, defaultValue: String): String {
-            val value = call.argument<Any>(key)
-            return when (value) {
-                is Number -> value.toString()
-                is String -> value
-                else -> defaultValue
-            }
-        }
-
-        fun getInt(key: String, defaultValue: Int): Int {
-            return call.argument<Number>(key)?.toInt() ?: defaultValue
-        }
-
         val layout = PlugPagCustomPrinterLayout(
-            title = getString("title", "Comprovante"),
-            titleColor = getColorString("titleColor", 0xFFE000.toString()),
-            confirmTextColor = getColorString("confirmTextColor", 0x1.toString()),
-            cancelTextColor = getColorString("cancelTextColor", 0x777778.toString()),
-            windowBackgroundColor = getColorString("windowBackgroundColor", 0xE13C70.toString()),
-            buttonBackgroundColor = getColorString("buttonBackgroundColor", 0x1.toString()),
-            buttonBackgroundColorDisabled = getColorString("buttonBackgroundColorDisabled", 0x1.toString()),
-            sendSMSTextColor = getColorString("sendSMSTextColor", 0xFFE000.toString()),
-            maxTimeShowPopup = getInt("maxTimeShowPopup", 10)
+            title = Util.callString(call, "title", "Comprovante"),
+            titleColor = Util.callHex(call, "titleColor", "#FFFFE000"),
+            confirmTextColor = Util.callHex(call, "confirmTextColor", "#FFFFFFFF"),
+            cancelTextColor = Util.callHex(call, "cancelTextColor", "#FF777778"),
+            windowBackgroundColor = Util.callHex(call, "windowBackgroundColor", "#FFE13C70"),
+            buttonBackgroundColor = Util.callHex(call, "buttonBackgroundColor", "#FF000000"),
+            buttonBackgroundColorDisabled = Util.callHex(call, "buttonBackgroundColorDisabled", "#FFBDBDBD"),
+            sendSMSTextColor = Util.callHex(call, "sendSMSTextColor", "#FFFFE000"),
+            maxTimeShowPopup = Util.callInt(call, "maxTimeShowPopup", 10)
         )
 
         CoroutineHelper.launchIO(scope) {

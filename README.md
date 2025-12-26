@@ -36,9 +36,10 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
   - [Inicialização](#4-2-inicializacao)
     - [Verificando se PinPad está Autenticado](#4-2-1-verificando-pinpad)
     - [Ativando o PinPad](#4-2-2-ativando-pinpad)
+    - [Layout de Janelas PagSeguro](#4-2-3-layout)
   - [Pagamentos](#4-3-pagamentos)
   - [Estorno](#4-4-estorno)
-  - [Reimpressão & Recibos](#4-5-reimpressao-recibos)
+  - [Impressão & Recibos](#4-5-impressao-recibos)
   - [Callbacks](#4-6-callbacks)
 - [Constantes](#5-constantes)
   - [Tipos de Pagamento](#5-1-tipos-de-pagamento)
@@ -234,6 +235,32 @@ Future<void> initPinPad(String codigoAtivacao) async {
 }
 ```
 
+### <span id="4-2-3-layout"></span> Layout de Janelas PagSeguro
+
+> ⚠️ **Nota sobre cores** — O SDK do PagSeguro PlugPag é sensível a cores inválidas.
+Necessário atenção para evitar crashes como _**IllegalArgumentException: Unknown color**_.
+
+```dart
+final preset = LayoutPresets.presets[layoutPreset]!;
+
+final result = await pagSeguro.setStyleData(
+    headTextColor: preset['headTextColor']!,
+    headBackgroundColor: preset['headBackgroundColor']!,
+    contentTextColor: preset['contentTextColor']!,
+    contentTextValue1Color: preset['contentTextValue1Color']!,
+    contentTextValue2Color: preset['contentTextValue2Color']!,
+    positiveButtonTextColor: preset['positiveButtonTextColor']!,
+    positiveButtonBackground: preset['positiveButtonBackground']!,
+    negativeButtonTextColor: preset['negativeButtonTextColor']!,
+    negativeButtonBackground: preset['negativeButtonBackground']!,
+    genericButtonBackground: preset['genericButtonBackground']!,
+    genericButtonTextColor: preset['genericButtonTextColor']!,
+    genericSmsEditTextBackground: preset['genericSmsEditTextBackground']!,
+    genericSmsEditTextTextColor: preset['genericSmsEditTextTextColor']!,
+    lineColor: preset['lineColor']!,
+);
+```
+
 ---
 
 ## <span id="4-3-pagamentos"></span> 💳 Pagamentos
@@ -269,7 +296,25 @@ final estorno = await pagSeguro.voidPayment(
 
 ---
 
-## <span id="4-5-reimpressao-recibos"></span> 🧾 Reimpressão & Recibos
+## <span id="4-5-impressao-recibos"></span> 🧾 Impressão & Recibos
+
+Definir Ação de Impressão do Recibo do **Cliente**:
+
+```dart
+await pagSeguro.setPrintActionListener(
+    askCustomerReceipt: true,
+    smsReceipt: false,
+);
+```
+
+Definir Estilo, Cor e Tempo de Exibição da Janela de Recibo do **Cliente**:
+
+> ⚠️ **Nota sobre cores** — O SDK do PagSeguro PlugPag é sensível a cores inválidas.
+Necessário atenção para evitar crashes como _**IllegalArgumentException: Unknown color**_.
+
+```dart
+await pagSeguro.setPlugPagCustomPrinterLayout('Comprovante');
+```
 
 Reimprimir via **Cliente**:
 

@@ -21,6 +21,7 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagUserDataResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.exception.PlugPagException
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagStyleData
 import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagSetStylesListener
+import com.takeodev.pagseguro_smart.utils.Util
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
 
@@ -411,26 +412,21 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona **/
     fun setStyleData(call: MethodCall, result: MethodChannel.Result) {
-        // Valores Default
-        fun getColor(key: String, defaultValue: Int): Int {
-            return call.argument<Number>(key)?.toInt() ?: defaultValue
-        }
-
         val styleData = PlugPagStyleData(
-            headTextColor = getColor("headTextColor", 0x1),
-            headBackgroundColor = getColor("headBackgroundColor", 0xE13C70),
-            contentTextColor = getColor("contentTextColor", 0xDFDFE0),
-            contentTextValue1Color = getColor("contentTextValue1Color", 0xFFE000),
-            contentTextValue2Color = getColor("contentTextValue2Color", 0x100000),
-            positiveButtonTextColor = getColor("positiveButtonTextColor", 0x1),
-            positiveButtonBackground = getColor("positiveButtonBackground", 0xFF358C),
-            negativeButtonTextColor = getColor("negativeButtonTextColor", 0x777778),
-            negativeButtonBackground = getColor("negativeButtonBackground", 0x00FFFFFF),
-            genericButtonBackground = getColor("genericButtonBackground", 0x1),
-            genericButtonTextColor = getColor("genericButtonTextColor", 0xFF358C),
-            genericSmsEditTextBackground = getColor("genericSmsEditTextBackground", 0x1),
-            genericSmsEditTextTextColor = getColor("genericSmsEditTextTextColor", 0xFF358C),
-            lineColor = getColor("lineColor", 0x1000000)
+            headTextColor = Util.callColorInt(call, "headTextColor", 0xFF000000.toInt()),
+            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor", 0xFFE13C70.toInt()),
+            contentTextColor = Util.callColorInt(call, "contentTextColor", 0xFFDFDFE0.toInt()),
+            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color", 0xFFFFE000.toInt()),
+            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color", 0xFF000000.toInt()),
+            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor", 0xFFFFFFFF.toInt()),
+            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground", 0xFFFF358C.toInt()),
+            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor", 0xFF777778.toInt()),
+            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground", 0xFF000000.toInt()),
+            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground", 0xFF000000.toInt()),
+            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor", 0xFFFF358C.toInt()),
+            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground", 0xFF000000.toInt()),
+            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor", 0xFFFF358C.toInt()),
+            lineColor = Util.callColorInt(call, "lineColor", 0xFF000000.toInt())
         )
 
         CoroutineHelper.launchIO(scope) {
@@ -473,25 +469,21 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Assíncrona **/
     fun asyncSetStyles(call: MethodCall, result: MethodChannel.Result) {
-        fun getColor(key: String, defaultValue: Int): Int {
-            return call.argument<Number>(key)?.toInt() ?: defaultValue
-        }
-
         val styleData = PlugPagStyleData(
-            headTextColor = getColor("headTextColor", 0x1),
-            headBackgroundColor = getColor("headBackgroundColor", 0xE13C70),
-            contentTextColor = getColor("contentTextColor", 0xDFDFE0),
-            contentTextValue1Color = getColor("contentTextValue1Color", 0xFFE000),
-            contentTextValue2Color = getColor("contentTextValue2Color", 0x100000),
-            positiveButtonTextColor = getColor("positiveButtonTextColor", 0x1),
-            positiveButtonBackground = getColor("positiveButtonBackground", 0xFF358C),
-            negativeButtonTextColor = getColor("negativeButtonTextColor", 0x777778),
-            negativeButtonBackground = getColor("negativeButtonBackground", 0x00FFFFFF),
-            genericButtonBackground = getColor("genericButtonBackground", 0x1),
-            genericButtonTextColor = getColor("genericButtonTextColor", 0xFF358C),
-            genericSmsEditTextBackground = getColor("genericSmsEditTextBackground", 0x1),
-            genericSmsEditTextTextColor = getColor("genericSmsEditTextTextColor", 0xFF358C),
-            lineColor = getColor("lineColor", 0x1000000)
+            headTextColor = Util.callColorInt(call, "headTextColor", 0xFF000000.toInt()),
+            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor", 0xFFE13C70.toInt()),
+            contentTextColor = Util.callColorInt(call, "contentTextColor", 0xFFDFDFE0.toInt()),
+            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color", 0xFFFFE000.toInt()),
+            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color", 0xFF000000.toInt()),
+            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor", 0xFFFFFFFF.toInt()),
+            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground", 0xFFFF358C.toInt()),
+            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor", 0xFF777778.toInt()),
+            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground", 0xFF000000.toInt()),
+            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground", 0xFF000000.toInt()),
+            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor", 0xFFFF358C.toInt()),
+            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground", 0xFF000000.toInt()),
+            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor", 0xFFFF358C.toInt()),
+            lineColor = Util.callColorInt(call, "lineColor", 0xFF000000.toInt())
         )
 
         CoroutineHelper.launchIO(scope) {

@@ -1,5 +1,10 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.7
+
+- [Fix] Função "_isServiceBusy_" do "**PaymentProvider**".
+- [Add] Novas Cores em Estilo Visual de Janelas PagSeguro.
+
 ## 1.0.6
 
 - [Improve] Verificador de Serviço da PagSeguro (Se Ocupado ou Livre).
