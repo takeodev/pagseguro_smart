@@ -61,17 +61,17 @@ void main() {
   });
 
   test('doPayment retorna Map simulado corretamente', () async {
+    PagSeguroEnum payType = PagSeguroEnum.tCredit;
     final result = await pagSeguro.doPayment(
-      type: PagSeguroType.credit,
+      type: payType,
       value: 1.50,
-      installmentType: PagSeguroInstallment.singlePay,
-      userReference: 'teste123',
+      userReference: 't${payType.code}p123',
     );
 
     expect(result, isA<Map>());
     expect(result['success'], true);
     expect(result['data']['amount'], 1.50);
-    expect(result['data']['userReference'], 'teste123');
+    expect(result['data']['userReference'], 'teste123${payType.description}');
   });
 
   test('abortTransaction retorna Map simulado corretamente', () async {

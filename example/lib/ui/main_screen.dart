@@ -28,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final PaymentProvider payProv = context.read<PaymentProvider>();
       await payProv.isAuthenticated();
-      await payProv.setStyleData(LayoutPreset.pagseguroDefault);
+      await payProv.setStyleData(LayoutPreset.darkBlue);
       await payProv.setPrintActionListener(askCustomerReceipt: true);
       await payProv.setPlugPagCustomPrinterLayout('Comprovante');
     });

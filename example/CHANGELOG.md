@@ -1,5 +1,10 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.8
+
+- [Fix] As classes "_PagSeguroType_", "_PagSeguroInstallment_" e "_PagSeguroVoid_" se tornaram enum "_PagSeguroEnum_".
+- [Improve] Forma de Utilizar os Layouts Pré-Configurados "**LayoutPreset**".
+
 ## 1.0.7
 
 - [Fix] Função "_isServiceBusy_" do "**PaymentProvider**".

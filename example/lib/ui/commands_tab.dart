@@ -41,13 +41,10 @@ class CommandsTab extends StatelessWidget {
                         icon: const Icon(Icons.color_lens_rounded),
                         onPressed:
                             payProv.isActivated &&
-                                payProv.actualPreset !=
-                                    LayoutPreset.pagseguroDefault
-                            ? () => payProv.setStyleData(
-                                LayoutPreset.pagseguroDefault,
-                              )
+                                payProv.actualPreset != LayoutPreset.blackPink
+                            ? () => payProv.setStyleData(LayoutPreset.blackPink)
                             : null,
-                        label: const Text('PagSeguro'),
+                        label: const Text('Tema Pink'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.colorize),

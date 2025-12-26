@@ -12,34 +12,34 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 /// ======================================================================================
 
 /// Exibe Diálogo para Seleção de Forma de Pagamento
-Future<int> payMethodDialog(BuildContext context) async {
-  final result = await DialogHelper.showBottom<int>(
+Future<PagSeguroEnum?> payMethodDialog(BuildContext context) async {
+  final PagSeguroEnum? result = await DialogHelper.showBottom<PagSeguroEnum>(
     context: context,
     title: 'Método de Pagamento',
     content: const Text('Selecione uma Forma de Pagamento.'),
     actions: [
       DialogHelper.primaryButton(
         'Crédito à Vista',
-        () => Navigator.pop(context, PagSeguroType.credit),
+        () => Navigator.pop(context, PagSeguroEnum.tCredit),
       ),
       DialogHelper.primaryButton(
         'Débito',
-        () => Navigator.pop(context, PagSeguroType.debit),
+        () => Navigator.pop(context, PagSeguroEnum.tDebit),
       ),
       DialogHelper.primaryButton(
         'Voucher',
-        () => Navigator.pop(context, PagSeguroType.voucher),
+        () => Navigator.pop(context, PagSeguroEnum.tVoucher),
       ),
       DialogHelper.primaryButton(
         'PIX (QrCode)',
-        () => Navigator.pop(context, PagSeguroType.pix),
+        () => Navigator.pop(context, PagSeguroEnum.tPix),
       ),
       DialogHelper.secondaryButton('Cancelar', () => Navigator.pop(context)),
     ],
   );
 
-  if (!context.mounted) return 0;
-  return result ?? 0;
+  if (!context.mounted) return null;
+  return result;
 }
 
 /// Exibe Diálogo perguntando se Imprime de Recibo de Estorno

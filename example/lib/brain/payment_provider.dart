@@ -26,7 +26,7 @@ class PaymentProvider extends ChangeNotifier {
   bool isLoading = false;
 
   // Configurações
-  LayoutPreset actualPreset = LayoutPreset.pagseguroDefault;
+  LayoutPreset actualPreset = LayoutPreset.darkBlue;
   bool askPrint = true;
   bool smsPrint = false;
   bool printListener = false;
@@ -270,31 +270,31 @@ class PaymentProvider extends ChangeNotifier {
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
-    final preset = LayoutPresets.presets[layoutPreset]!;
+    final style = LayoutPresets.of(layoutPreset);
 
     try {
       final result = await pagSeguro.setStyleData(
-        headTextColor: preset['headTextColor']!,
-        headBackgroundColor: preset['headBackgroundColor']!,
-        contentTextColor: preset['contentTextColor']!,
-        contentTextValue1Color: preset['contentTextValue1Color']!,
-        contentTextValue2Color: preset['contentTextValue2Color']!,
-        positiveButtonTextColor: preset['positiveButtonTextColor']!,
-        positiveButtonBackground: preset['positiveButtonBackground']!,
-        negativeButtonTextColor: preset['negativeButtonTextColor']!,
-        negativeButtonBackground: preset['negativeButtonBackground']!,
-        genericButtonBackground: preset['genericButtonBackground']!,
-        genericButtonTextColor: preset['genericButtonTextColor']!,
-        genericSmsEditTextBackground: preset['genericSmsEditTextBackground']!,
-        genericSmsEditTextTextColor: preset['genericSmsEditTextTextColor']!,
-        lineColor: preset['lineColor']!,
+        headTextColor: style.headTextColor,
+        headBackgroundColor: style.headBackgroundColor,
+        contentTextColor: style.contentTextColor,
+        contentTextValue1Color: style.contentTextValue1Color,
+        contentTextValue2Color: style.contentTextValue2Color,
+        positiveButtonTextColor: style.positiveButtonTextColor,
+        positiveButtonBackground: style.positiveButtonBackground,
+        negativeButtonTextColor: style.negativeButtonTextColor,
+        negativeButtonBackground: style.negativeButtonBackground,
+        genericButtonBackground: style.genericButtonBackground,
+        genericButtonTextColor: style.genericButtonTextColor,
+        genericSmsEditTextBackground: style.genericSmsEditTextBackground,
+        genericSmsEditTextTextColor: style.genericSmsEditTextTextColor,
+        lineColor: style.lineColor,
       );
       message = result['message']!;
       actualPreset = layoutPreset;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      actualPreset = LayoutPreset.pagseguroDefault;
+      actualPreset = LayoutPreset.darkBlue;
       message = 'Erro ao Definir Estilo!';
       displayMessage = '$message\n$e';
     } finally {
@@ -324,20 +324,18 @@ class PaymentProvider extends ChangeNotifier {
 
     BotToast.showText(text: message);
 
-    int payMethod = await payMethodDialog(context);
+    PagSeguroEnum? payType = await payMethodDialog(context);
 
     try {
-      if (payMethod == 0) {
+      if (payType == null) {
         message = 'Cancelado Pagamento';
         displayMessage = message;
         BotToast.showText(text: message);
       } else {
         final result = await pagSeguro.doPayment(
-          type: payMethod,
+          type: payType,
           value: value,
-          installmentType: PagSeguroInstallment.singlePay,
-          installments: 1,
-          userReference: 'userid$payMethod',
+          userReference: 't${payType.code}p123',
           printReceipt: false,
         );
 
@@ -404,7 +402,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   Future<void> voidPayment(
     BuildContext context, {
-    int voidType = PagSeguroVoid.common,
+    PagSeguroEnum voidType = PagSeguroEnum.vCommon,
   }) async {
     if (transactionCode == null ||
         transactionId == null ||

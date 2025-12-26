@@ -41,16 +41,16 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
   - [Estorno](#4-4-estorno)
   - [Impressão & Recibos](#4-5-impressao-recibos)
   - [Callbacks](#4-6-callbacks)
-- [Constantes](#5-constantes)
+- [Identificações PagSeguro](#5-identificacao)
   - [Tipos de Pagamento](#5-1-tipos-de-pagamento)
   - [Parcelamento](#5-2-parcelamento)
   - [Estorno](#5-3-estorno)
+  - [Como Utilizar o "PagSeguroEnum"](#5-4-utilizar-enum)
 - [Models](#6-models)
 - [Notas Importantes](#7-notas-importantes)
 - [Desenvolvedor](#8-desenvolvedor)
 - [Licença](#9-licenca)
 - [Contribuições](#10-contribuicao)
-
 ---
 
 ## <span id="1-sobre"></span> 🎯 Sobre
@@ -241,23 +241,24 @@ Future<void> initPinPad(String codigoAtivacao) async {
 Necessário atenção para evitar crashes como _**IllegalArgumentException: Unknown color**_.
 
 ```dart
-final preset = LayoutPresets.presets[layoutPreset]!;
+final LayoutPreset preset = LayoutPreset.darkBlue;
+final style = LayoutPresets.of(layoutPreset);
 
 final result = await pagSeguro.setStyleData(
-    headTextColor: preset['headTextColor']!,
-    headBackgroundColor: preset['headBackgroundColor']!,
-    contentTextColor: preset['contentTextColor']!,
-    contentTextValue1Color: preset['contentTextValue1Color']!,
-    contentTextValue2Color: preset['contentTextValue2Color']!,
-    positiveButtonTextColor: preset['positiveButtonTextColor']!,
-    positiveButtonBackground: preset['positiveButtonBackground']!,
-    negativeButtonTextColor: preset['negativeButtonTextColor']!,
-    negativeButtonBackground: preset['negativeButtonBackground']!,
-    genericButtonBackground: preset['genericButtonBackground']!,
-    genericButtonTextColor: preset['genericButtonTextColor']!,
-    genericSmsEditTextBackground: preset['genericSmsEditTextBackground']!,
-    genericSmsEditTextTextColor: preset['genericSmsEditTextTextColor']!,
-    lineColor: preset['lineColor']!,
+    headTextColor: style.headTextColor,
+    headBackgroundColor: style.headBackgroundColor,
+    contentTextColor: style.contentTextColor,
+    contentTextValue1Color: style.contentTextValue1Color,
+    contentTextValue2Color: style.contentTextValue2Color,
+    positiveButtonTextColor: style.positiveButtonTextColor,
+    positiveButtonBackground: style.positiveButtonBackground,
+    negativeButtonTextColor: style.negativeButtonTextColor,
+    negativeButtonBackground: style.negativeButtonBackground,
+    genericButtonBackground: style.genericButtonBackground,
+    genericButtonTextColor: style.genericButtonTextColor,
+    genericSmsEditTextBackground: style.genericSmsEditTextBackground,
+    genericSmsEditTextTextColor: style.genericSmsEditTextTextColor,
+    lineColor: style.lineColor,
 );
 ```
 
@@ -266,10 +267,11 @@ final result = await pagSeguro.setStyleData(
 ## <span id="4-3-pagamentos"></span> 💳 Pagamentos
 
 ```dart
+PagSeguroEnum payType = PagSeguroEnum.tCredit;
 final result = await pagSeguro.doPayment(
-  type: PagSeguroType.credit,
+  type: payType,
   value: 50.00,
-  userReference: 'pedido123',
+  userReference: 't${payType.code}p123', // Pode ser qualquer identificador com limite de 10 caracteres, nesse exemplo tem o Tipo (t), Código do Tipo (${payType.code}), Pedido (p), Número do Pedido (123)
   printReceipt: true,
 );
 
@@ -286,10 +288,11 @@ if (result['success']) {
 ## <span id="4-4-estorno"></span> ⛔ Estorno
 
 ```dart
+PagSeguroEnum voidType = PagSeguroEnum.vCommon;
 final estorno = await pagSeguro.voidPayment(
   transactionCode: '123456',
   transactionId: '987654',
-  voidType: PagSeguroVoid.common,
+  voidType: voidType,
   printReceipt: true,
 );
 ```
@@ -360,22 +363,32 @@ void initState() {
 
 ---
 
-## <span id="5-constantes"></span> 🔧 Constantes
+## <span id="5-identificacao"></span> 🔧 Identificações PagSeguro
+
+O plugin possui facilitadores com identificações de **Tipos de Pagamento**, **Parcelamento** e **Estorno** da PagSeguro com códigos e descrição em **_enum_**:
 
 ### <span id="5-1-tipos-de-pagamento"></span> Tipos de Pagamento
-- `PagSeguroType.credit`
-- `PagSeguroType.debit`
-- `PagSeguroType.pix`
-- `PagSeguroType.voucher`
+- `PagSeguroEnum.tCredit`
+- `PagSeguroEnum.tDebit`
+- `PagSeguroEnum.tVoucher`
+- `PagSeguroEnum.tPix`
 
 ### <span id="5-2-parcelamento"></span> Parcelamento
-- `PagSeguroInstallment.singlePay`
-- `PagSeguroInstallment.forMerchant`
-- `PagSeguroInstallment.forCustomer`
+- `PagSeguroEnum.iSinglePay`
+- `PagSeguroEnum.iForMerchant`
+- `PagSeguroEnum.iForCustomer`
 
 ### <span id="5-3-estorno"></span> Estorno
-- `PagSeguroVoid.common`
-- `PagSeguroVoid.qrCode`
+- `PagSeguroEnum.vCommon`
+- `PagSeguroEnum.vQrCode`
+
+### <span id="5-4-utilizar-enum"></span> Como Utilizar o "**_PagSeguroEnum_**"
+
+```dart
+PagSeguroEnum pagSeguroEnum = PagSeguroEnum.tCredit;
+print('Código: ${pagSeguroEnum.code}'); // Enviar para a PagSeguro sempre o Código
+print('Descrição: ${pagSeguroEnum.description}'); // Utilizar para Tratativas Internas como preferir
+```
 
 ---
 

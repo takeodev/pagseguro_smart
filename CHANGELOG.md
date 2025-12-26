@@ -1,5 +1,14 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.0
+
+- [Improve] Em "**Constants**", as classes de identificações de tipo de pagamento, parcelamento e estorno da PagSeguro se tornaram _enum_ com código e descrição.
+- [Remove] Em "**Constants**", classes "_~~PagSeguroType~~_", "_~~PagSeguroInstallment~~_" e "_~~PagSeguroVoid~~_".
+- [Add] Em "**Constants**", enum "_PagSeguroEnum_" para substituir as classes removidas.
+- [Add] Model de "_PlugPagStyleData_" da PagSeguro e nomeado como "**StyleDataModel**".
+- [Improve] Forma de Utilizar os Layouts Pré-Configurados "**LayoutPreset**".
+- [Improve] Atualizado README.
+
 ## 1.1.2
 
 - [Add] Segurança com HEX Completo em "**LayoutPresets**".

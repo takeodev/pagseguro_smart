@@ -27,27 +27,28 @@ class Constants {
   ];
 }
 
-class PagSeguroType {
-  /// Tipos de pagamento suportados pela PagSeguro
-  static const int credit = 1; // PlugPag.TYPE_CREDITO
-  static const int debit = 2; // PlugPag.TYPE_DEBITO
-  static const int voucher = 3; // PlugPag.TYPE_VOUCHER
-  static const int qrCode = 4; // PlugPag.TYPE_QRCODE
-  static const int pix = 5; // PlugPag.TYPE_PIX
-  static const int preAuthCard = 7; // PlugPag.TYPE_PREAUTO_CARD
-  static const int qrCodeCredit = 8; // PlugPag.TYPE_QRCODE_CREDITO
-  static const int preAuthKeyed = 9; // PlugPag.TYPE_PREAUTO_KEYED
-}
+enum PagSeguroEnum {
+  /// Tipos de pagamento suportados pela PagSeguro (t = type)
+  tCredit(1, 'credit'), // PlugPag.TYPE_CREDITO
+  tDebit(2, 'debit'), // PlugPag.TYPE_DEBITO
+  tVoucher(3, 'voucher'), // PlugPag.TYPE_VOUCHER
+  tQrCode(4, 'qrCode'), // PlugPag.TYPE_QRCODE
+  tPix(5, 'pix'), // PlugPag.TYPE_PIX
+  tPreAuthCard(7, 'preAuthCard'), // PlugPag.TYPE_PREAUTO_CARD
+  tQrCodeCredit(8, 'qrCodeCredit'), // PlugPag.TYPE_QRCODE_CREDITO
+  tPreAuthKeyed(9, 'preAuthKeyed'), // PlugPag.TYPE_PREAUTO_KEYED
 
-class PagSeguroInstallment {
-  /// Tipos de parcelamento suportados pela PagSeguro
-  static const int singlePay = 1; // PlugPag.INSTALLMENT_TYPE_A_VISTA
-  static const int forMerchant = 2; // PlugPag.INSTALLMENT_TYPE_PARC_VENDEDOR
-  static const int forCustomer = 3; // PlugPag.INSTALLMENT_TYPE_PARC_COMPRADOR
-}
+  /// Tipos de parcelamento suportados pela PagSeguro (i = installment type)
+  iSinglePay(1, 'singlePay'), // PlugPag.INSTALLMENT_TYPE_A_VISTA
+  iForMerchant(2, 'forMerchant'), // PlugPag.INSTALLMENT_TYPE_PARC_VENDEDOR
+  iForCustomer(3, 'forCustomer'), // PlugPag.INSTALLMENT_TYPE_PARC_COMPRADOR
 
-class PagSeguroVoid {
-  /// Tipos de estorno suportados pela PagSeguro
-  static const int common = 1; // PlugPag.VOID_PAYMENT
-  static const int qrCode = 2; // PlugPag.VOID_QRCODE
+  /// Tipos de estorno suportados pela PagSeguro (v = void)
+  vCommon(1, 'common'), // PlugPag.VOID_PAYMENT
+  vQrCode(2, 'qrCode'); // PlugPag.VOID_QRCODE
+
+  final int code;
+  final String description;
+
+  const PagSeguroEnum(this.code, this.description);
 }

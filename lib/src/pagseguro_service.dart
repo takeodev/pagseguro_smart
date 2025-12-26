@@ -158,34 +158,36 @@ class PagSeguroService {
 
   /// Realiza o Pagamento
   Future<Map<String, dynamic>> doPayment({
-    required int type,
+    PagSeguroEnum type = PagSeguroEnum.tCredit,
     required double value,
-    int installmentType = PagSeguroInstallment.singlePay,
+    PagSeguroEnum installmentType = PagSeguroEnum.iSinglePay,
     int installments = 1,
     required String userReference,
     bool printReceipt = false,
   }) =>
       _invokeNative('doPayment', {
-        'type': type,
+        'type': type.code,
         'amount': value,
-        'installmentType': installmentType,
-        'installments': installments,
+        'installmentType': installmentType.code,
+        'installments':
+            installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
         'userReference': userReference,
         'printReceipt': printReceipt,
       });
   Future<Map<String, dynamic>> doAsyncPayment({
-    required int type,
+    PagSeguroEnum type = PagSeguroEnum.tCredit,
     required double value,
-    int installmentType = PagSeguroInstallment.singlePay,
+    PagSeguroEnum installmentType = PagSeguroEnum.iSinglePay,
     int installments = 1,
     required String userReference,
     bool printReceipt = false,
   }) =>
       _invokeNative('doAsyncPayment', {
-        'type': type,
+        'type': type.code,
         'amount': value,
-        'installmentType': installmentType,
-        'installments': installments,
+        'installmentType': installmentType.code,
+        'installments':
+            installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
         'userReference': userReference,
         'printReceipt': printReceipt,
       });
@@ -200,25 +202,25 @@ class PagSeguroService {
   Future<Map<String, dynamic>> voidPayment({
     required String transactionCode,
     required String transactionId,
-    int voidType = PagSeguroVoid.common,
+    PagSeguroEnum voidType = PagSeguroEnum.vCommon,
     bool printReceipt = false,
   }) =>
       _invokeNative('voidPayment', {
         'transactionCode': transactionCode,
         'transactionId': transactionId,
-        'voidType': voidType,
+        'voidType': voidType.code,
         'printReceipt': printReceipt,
       });
   Future<Map<String, dynamic>> asyncVoidPayment({
     required String transactionCode,
     required String transactionId,
-    int voidType = PagSeguroVoid.common,
+    PagSeguroEnum voidType = PagSeguroEnum.vCommon,
     bool printReceipt = false,
   }) =>
       _invokeNative('asyncVoidPayment', {
         'transactionCode': transactionCode,
         'transactionId': transactionId,
-        'voidType': voidType,
+        'voidType': voidType.code,
         'printReceipt': printReceipt,
       });
 
