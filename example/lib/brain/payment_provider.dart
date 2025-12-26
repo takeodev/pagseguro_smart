@@ -25,6 +25,12 @@ class PaymentProvider extends ChangeNotifier {
   bool canAbort = false;
   bool isLoading = false;
 
+  // Configurações
+  LayoutPreset actualPreset = LayoutPreset.pagseguroDefault;
+  bool askPrint = true;
+  bool smsPrint = false;
+  bool printAppName = false;
+
   // Dados a Serem Exibidos
   String displayMessage = '';
   String? transactionCode;
@@ -115,6 +121,185 @@ class PaymentProvider extends ChangeNotifier {
     } finally {
       isLoading = false;
       isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
+  // DADOS DO USUÁRIO
+  // ============================================================
+  Future<void> getUserData(BuildContext context) async {
+    if (isTapped) return;
+    isTapped = true;
+
+    String message = 'Buscando Dados do Usuário...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+
+    try {
+      final result = await pagSeguro.getUserData();
+
+      if (result['success'] && context.mounted) {
+        final model = UserDataModel.fromMap(result['data']);
+        await userDialog(context, model);
+      }
+
+      message = result['message'] ?? '';
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      message = 'Erro ao Buscar Dados!';
+      displayMessage = '$message\n$e';
+      BotToast.showText(text: message);
+    } finally {
+      isLoading = false;
+      isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
+  // NÚMERO DE SÉRIE
+  // ============================================================
+  Future<void> getSerialNumber(BuildContext context) async {
+    if (isTapped) return;
+    isTapped = true;
+
+    String message = 'Buscando Número de Série...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+
+    try {
+      final result = await pagSeguro.getSerialNumber();
+
+      if (result['success'] && context.mounted) {
+        await serialDialog(context, result['data']);
+      }
+
+      message = result['message'] ?? '';
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      message = 'Erro ao Buscar Número de Série!';
+      displayMessage = '$message\n$e';
+    } finally {
+      isLoading = false;
+      isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
+  // REINICIAR DISPOSITIVO
+  // ============================================================
+  Future<void> rebootDevice(BuildContext context) async {
+    if (isTapped) return;
+    isTapped = true;
+
+    String message = 'Reiniciando Maquininha...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+
+    try {
+      final reboot = await rebootDialog(context);
+      if (reboot) {
+        final result = await pagSeguro.rebootDevice();
+        message = result['message']!;
+      } else {
+        message = 'Cancelada Reinicialização';
+      }
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      message = 'Erro ao Reiniciar!';
+      displayMessage = '$message\n$e';
+    } finally {
+      isLoading = false;
+      isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
+  // VERIFICADOR DE SERVIÇO
+  // ============================================================
+  Future<bool> isServiceBusy() async {
+    bool isBusy = true;
+    if (isServiceTapped) return isBusy;
+    isServiceTapped = true;
+
+    String message = 'Verificando Serviço...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+
+    try {
+      final result = await pagSeguro.isServiceBusy();
+      message = result['message']!;
+      isBusy = !(result['data'] ?? true);
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      message = 'Erro ao Verificar Serviço!';
+      displayMessage = '$message\n$e';
+    } finally {
+      isLoading = false;
+      isServiceTapped = false;
+      notifyListeners();
+    }
+
+    return isBusy;
+  }
+
+  // ============================================================
+  // ESTILO DE JANELAS PAGSEGURO
+  // ============================================================
+  Future<void> setStyleData(LayoutPreset layoutPreset) async {
+    if (isServiceTapped) return;
+    isServiceTapped = true;
+
+    String message = 'Definindo Estilo...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+    final colors = LayoutPresets.presets[layoutPreset]!;
+
+    try {
+      final result = await pagSeguro.setStyleData(
+        headTextColor: colors['headTextColor']!,
+        headBackgroundColor: colors['headBackgroundColor']!,
+        contentTextColor: colors['contentTextColor']!,
+        contentTextValue1Color: colors['contentTextValue1Color']!,
+        contentTextValue2Color: colors['contentTextValue2Color']!,
+        positiveButtonTextColor: colors['positiveButtonTextColor']!,
+        positiveButtonBackground: colors['positiveButtonBackground']!,
+        negativeButtonTextColor: colors['negativeButtonTextColor']!,
+        negativeButtonBackground: colors['negativeButtonBackground']!,
+        genericButtonBackground: colors['genericButtonBackground']!,
+        genericButtonTextColor: colors['genericButtonTextColor']!,
+        genericSmsEditTextBackground: colors['genericSmsEditTextBackground']!,
+        genericSmsEditTextTextColor: colors['genericSmsEditTextTextColor']!,
+        lineColor: colors['lineColor']!,
+      );
+      message = result['message']!;
+      actualPreset = layoutPreset;
+      displayMessage = message;
+      BotToast.showText(text: message);
+    } catch (e) {
+      actualPreset = LayoutPreset.pagseguroDefault;
+      message = 'Erro ao Definir Estilo!';
+      displayMessage = '$message\n$e';
+    } finally {
+      isLoading = false;
+      isServiceTapped = false;
       notifyListeners();
     }
   }
@@ -274,65 +459,30 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // ============================================================
-  // DADOS DO USUÁRIO
+  // OBTER CÓDIGO DA ÚLTIMA TRANSAÇÃO
   // ============================================================
-  Future<void> getUserData(BuildContext context) async {
+  Future<void> getLastTransaction() async {
     if (isTapped) return;
     isTapped = true;
 
-    String message = 'Buscando Dados do Usuário...';
+    String message = 'Buscando Última Transação...';
     displayMessage = message;
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.getUserData();
+      final result = await pagSeguro.getLastTransaction();
 
-      if (result['success'] && context.mounted) {
-        final model = UserDataModel.fromMap(result['data']);
-        await userDialog(context, model);
-      }
+      final model = TransactionDataModel.fromMap(result['data']);
+      transactionCode = model.transactionCode;
+      transactionId = model.transactionId;
 
-      message = result['message'] ?? '';
+      message = result['message']!;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      message = 'Erro ao Buscar Dados!';
-      displayMessage = '$message\n$e';
-      BotToast.showText(text: message);
-    } finally {
-      isLoading = false;
-      isTapped = false;
-      notifyListeners();
-    }
-  }
-
-  // ============================================================
-  // NÚMERO DE SÉRIE
-  // ============================================================
-  Future<void> getSerialNumber(BuildContext context) async {
-    if (isTapped) return;
-    isTapped = true;
-
-    String message = 'Buscando Número de Série...';
-    displayMessage = message;
-    isLoading = true;
-    notifyListeners();
-    BotToast.showText(text: message);
-
-    try {
-      final result = await pagSeguro.getSerialNumber();
-
-      if (result['success'] && context.mounted) {
-        await serialDialog(context, result['data']);
-      }
-
-      message = result['message'] ?? '';
-      displayMessage = message;
-      BotToast.showText(text: message);
-    } catch (e) {
-      message = 'Erro ao Buscar Número de Série!';
+      message = 'Erro ao Buscar Última Transação!';
       displayMessage = '$message\n$e';
     } finally {
       isLoading = false;
@@ -401,30 +551,36 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // ============================================================
-  // REINICIAR DISPOSITIVO
+  // CONFIGURAR IMPRESSÃO DE RECIBO DO CLIENTE
   // ============================================================
-  Future<void> rebootDevice(BuildContext context) async {
+  Future<void> setPrintActionListener({
+    bool askCustomerReceipt = false,
+    bool smsReceipt = false,
+  }) async {
     if (isTapped) return;
     isTapped = true;
 
-    String message = 'Reiniciando Maquininha...';
+    String message = 'Configurando Recibo do Cliente...';
     displayMessage = message;
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
 
     try {
-      final reboot = await rebootDialog(context);
-      if (reboot) {
-        final result = await pagSeguro.rebootDevice();
-        message = result['message']!;
-      } else {
-        message = 'Cancelada Reinicialização';
-      }
+      final result = await pagSeguro.setPrintActionListener(
+        askCustomerReceipt: askCustomerReceipt,
+        smsReceipt: smsReceipt,
+      );
+
+      message = result['message'] ?? '';
+      askPrint = askCustomerReceipt;
+      smsPrint = smsReceipt;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      message = 'Erro ao Reiniciar!';
+      askPrint = true;
+      smsPrint = false;
+      message = 'Erro ao Configurar Recibo do Cliente!';
       displayMessage = '$message\n$e';
     } finally {
       isLoading = false;
@@ -434,58 +590,27 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // ============================================================
-  // OBTER CÓDIGO DA ÚLTIMA TRANSAÇÃO
+  // ESTILO DO RECIBO DO CLIENTE
   // ============================================================
-  Future<void> getLastTransaction() async {
-    if (isTapped) return;
-    isTapped = true;
-
-    String message = 'Buscando Última Transação...';
-    displayMessage = message;
-    isLoading = true;
-    notifyListeners();
-    BotToast.showText(text: message);
-
-    try {
-      final result = await pagSeguro.getLastTransaction();
-
-      final model = TransactionDataModel.fromMap(result['data']);
-      transactionCode = model.transactionCode;
-      transactionId = model.transactionId;
-
-      message = result['message']!;
-      displayMessage = message;
-      BotToast.showText(text: message);
-    } catch (e) {
-      message = 'Erro ao Buscar Última Transação!';
-      displayMessage = '$message\n$e';
-    } finally {
-      isLoading = false;
-      isTapped = false;
-      notifyListeners();
-    }
-  }
-
-  // ============================================================
-  // VERIFICADOR DE SERVIÇO
-  // ============================================================
-  Future<void> isServiceNotBusy() async {
+  Future<void> setPlugPagCustomPrinterLayout(String title) async {
     if (isServiceTapped) return;
     isServiceTapped = true;
 
-    String message = 'Verificando Serviço...';
+    String message = 'Definindo Estilo do Recibo...';
     displayMessage = message;
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.isServiceNotBusy();
+      final result = await pagSeguro.setPlugPagCustomPrinterLayout(title);
       message = result['message']!;
+      printAppName = true;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      message = 'Erro ao Verificar Serviço!';
+      printAppName = false;
+      message = 'Erro ao Definir Estilo do Recibo!';
       displayMessage = '$message\n$e';
     } finally {
       isLoading = false;

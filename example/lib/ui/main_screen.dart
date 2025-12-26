@@ -1,6 +1,9 @@
+import 'package:example/brain/payment_provider.dart';
 import 'package:example/ui/commands_tab.dart';
 import 'package:example/ui/payment_tab.dart';
 import 'package:flutter/material.dart';
+import 'package:pagseguro_smart/pagseguro_smart.dart';
+import 'package:provider/provider.dart';
 
 /// ======================================================================================
 /// Arquivo         : ui/payment_screen.dart
@@ -10,8 +13,26 @@ import 'package:flutter/material.dart';
 /// Autor           : Fernando Takeo Miyaji
 /// ======================================================================================
 
-class MainScreen extends StatelessWidget {
+class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
+
+  @override
+  State<MainScreen> createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final PaymentProvider payProv = context.read<PaymentProvider>();
+      await payProv.isAuthenticated();
+      await payProv.setPrintActionListener(askCustomerReceipt: true);
+      await payProv.setStyleData(LayoutPreset.pagseguroDefault);
+      await payProv.setPlugPagCustomPrinterLayout('Comprovante');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

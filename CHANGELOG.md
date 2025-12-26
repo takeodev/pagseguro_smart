@@ -1,5 +1,16 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.1.1
+
+- [Improve] Verificador de Serviço da PagSeguro (Ocupado ou Livre).
+- [Add] Dispose de Métodos Assíncronos (_plugPag.disposeSubscriber_).
+- [Add] Método Síncrono "_setPrintActionListener_".
+- [Add] Método Síncrono "_setStyleData_".
+- [Add] Método Assíncrono "_asyncSetStyles_".
+- [Add] Método Síncrono "_setPlugPagCustomPrinterLayout_".
+- [Add] Layouts Pré-Configurados de Janelas PagSeguro "**LayoutPresets**".
+- [Improve] Segurança de Valores de _Double_ > _Integer_ (Aceito pelo Wrapper da PagSeguro).
+
 ## 1.1.0
 
 - [Fix] Packaged name "_~~takeodev.pagseguro_smart~~_" => "_com.takeodev.pagseguro_smart_".

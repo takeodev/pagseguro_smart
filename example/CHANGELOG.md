@@ -1,5 +1,13 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.6
+
+- [Improve] Verificador de Serviço da PagSeguro (Se Ocupado ou Livre).
+- [Add] Configuração de Impressão de Recibo do Cliente.
+- [Add] Estilo Visual (Cores) de Janelas PagSeguro.
+- [Improve] Organizado Código do "**PaymentProvider**".
+- [Improve] Autenticação do PinPad apenas ao Abrir o App.
+
 ## 1.0.5
 
 - [Improve] Autenticação do PinPad ao Iniciar o App.
@@ -13,13 +21,13 @@
 
 - [Downgrade] app\build.gradle, minSdkVersion (24 => 23) - Pré-requisito PagSeguro para Assinatura V1.
 - [Downgrade] app\build.gradle, targetSdkVersion (36 => 34) - Pré-requisito PagSeguro para Assinatura V1.
-- [Add] Adicionado Prefixos ao CHANGELOG.
+- [Add] Prefixos ao CHANGELOG.
 - [Improve] Nome do App ao Instalar "PagSeguro Smart Example".
 - [Removed] Funcionalidade "integration_test" pela dependência do minSdkVersion 24.
 
 ## 1.0.2
 
-- [Add] Adicionado Verificador de Autenticação do PinPad ao Iniciar o App.
+- [Add] Verificador de Autenticação do PinPad ao Iniciar o App.
 
 ## 1.0.1
 

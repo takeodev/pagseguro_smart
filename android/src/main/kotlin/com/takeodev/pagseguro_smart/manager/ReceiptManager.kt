@@ -16,8 +16,13 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrintResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrinterListener
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagReceiptSMSData
 import br.com.uol.pagseguro.plugpagservice.wrapper.exception.PlugPagException
+import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagPrintActionListener
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagPrintActionResult
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagTransactionResult
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagCustomPrinterLayout
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
+
 
 /** Gerencia todas as operações de impressão **/
 class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineScope) {
@@ -94,6 +99,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "Reimpreso Recibo!",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -105,6 +111,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "${printResult.message} (${printResult.errorCode})",
                             "data" to null
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -116,6 +123,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro na Reimpressão de Recibo!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -183,6 +191,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "Reimpresso Recibo!",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -194,6 +203,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "${printResult.message} (${printResult.errorCode})",
                             "data" to null
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -205,6 +215,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro na Reimpressão de Recibo!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -274,6 +285,149 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                         "message" to "Erro ao Enviar SMS!",
                         "data" to null
                     ))
+                }
+            }
+        }
+    }
+
+    /** Configura Ações de Impressão de Recibo **/
+    fun setPrintActionListener(call: MethodCall, result: MethodChannel.Result) {
+        val askCustomerReceipt = call.argument<Boolean>("askCustomerReceipt") ?: false
+        val smsReceipt = call.argument<Boolean>("smsReceipt") ?: false
+        // val printReceipt = call.argument<Boolean>("printReceipt") ?: false
+
+        CoroutineHelper.launchIO(scope) {
+            try {
+                val listener = object : PlugPagPrintActionListener {
+                    override fun onPrint(
+                        phoneNumber: String?,
+                        transactionResult: PlugPagTransactionResult?,
+                        onFinishActions: PlugPagPrintActionListener.OnFinishPlugPagPrintActions?
+                    ) {
+                        CoroutineHelper.launchMain(scope) {
+                            val transactionId = transactionResult?.transactionId
+                            logger.info("setPrintActionListener (onPrint)", "Interceptando Impressão de Recibo | Id: $transactionId")
+
+                            when {
+                                // Exibe a tela de diálogo de envio ou impressão de comprovante (via do cliente).
+                                askCustomerReceipt -> { onFinishActions?.showPopup(plugPag) }
+
+                                // Realiza o envio do comprovante de transação (via do cliente) por SMS.
+                                smsReceipt -> {
+                                    if (!phoneNumber.isNullOrBlank()) {
+                                        onFinishActions?.sendSMS(plugPag, phoneNumber)
+                                    } else {
+                                        logger.warn("setPrintActionListener (phoneNumber.isNullOrBlank)", "Número de Telefone Inválido para SMS!")
+                                        onFinishActions?.showPopup(plugPag)
+                                    }
+                                }
+
+                                // Realiza a impressão do comprovante de transação (via do cliente).
+                                // printReceipt -> { onFinishActions?.doPrint(plugPag) }
+
+                                // Dispensa o envio e a impressão do comprovante (via do cliente).
+                                else -> { onFinishActions?.doNothing(plugPag) }
+                            }
+                        }
+                    }
+
+                    override fun onError(exception: PlugPagException?) {
+                        CoroutineHelper.launchMain(scope) {
+                            logger.error("setPrintActionListener (onError)", "Erro na Intercepção de Impressão de Recibo: ${exception?.message}")
+                        }
+                    }
+                }
+
+                val actionResult: PlugPagPrintActionResult = plugPag.setPrintActionListener(listener)
+                CoroutineHelper.launchMain(scope) {
+                    if (actionResult.result == PlugPag.RET_OK) {
+                        logger.info("setPrintActionListener", "Configurada Impressão de Recibo!")
+                        result.success(
+                            mapOf(
+                                "success" to true,
+                                "message" to "Configurada Impressão de Recibo!",
+                                "data" to actionResult.result
+                            )
+                        )
+                    } else {
+                        logger.error("setPrintActionListener", "Falha ao Configurar Impressão de Recibo | Code: ${actionResult.result}")
+                        result.success(
+                            mapOf(
+                                "success" to false,
+                                "message" to "Falha ao Configurar Impressão de Recibo!",
+                                "data" to actionResult.result
+                            )
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                CoroutineHelper.launchMain(scope) {
+                    logger.error("setPrintActionListener (Exception)", "Erro na Intercepção de Impressão de Recibo: ${e.message}")
+                    result.success(mapOf(
+                        "success" to false,
+                        "message" to "Erro na Intercepção de Impressão de Recibo!",
+                        "data" to null
+                    ))
+                }
+            }
+        }
+    }
+
+    /** Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona **/
+    fun setPlugPagCustomPrinterLayout(call: MethodCall, result: MethodChannel.Result) {
+        fun getString(key: String, defaultValue: String): String {
+            return call.argument<String>(key) ?: defaultValue
+        }
+
+        fun getColorString(key: String, defaultValue: String): String {
+            val value = call.argument<Any>(key)
+            return when (value) {
+                is Number -> value.toString()
+                is String -> value
+                else -> defaultValue
+            }
+        }
+
+        fun getInt(key: String, defaultValue: Int): Int {
+            return call.argument<Number>(key)?.toInt() ?: defaultValue
+        }
+
+        val layout = PlugPagCustomPrinterLayout(
+            title = getString("title", "Comprovante"),
+            titleColor = getColorString("titleColor", 0xFFE000.toString()),
+            confirmTextColor = getColorString("confirmTextColor", 0x1.toString()),
+            cancelTextColor = getColorString("cancelTextColor", 0x777778.toString()),
+            windowBackgroundColor = getColorString("windowBackgroundColor", 0xE13C70.toString()),
+            buttonBackgroundColor = getColorString("buttonBackgroundColor", 0x1.toString()),
+            buttonBackgroundColorDisabled = getColorString("buttonBackgroundColorDisabled", 0x1.toString()),
+            sendSMSTextColor = getColorString("sendSMSTextColor", 0xFFE000.toString()),
+            maxTimeShowPopup = getInt("maxTimeShowPopup", 10)
+        )
+
+        CoroutineHelper.launchIO(scope) {
+            try {
+                plugPag.setPlugPagCustomPrinterLayout(layout)
+
+                CoroutineHelper.launchMain(scope) {
+                    logger.info("setPlugPagCustomPrinterLayout", "Estilo de Recibo do Cliente Configurado!")
+                    result.success(
+                        mapOf(
+                            "success" to true,
+                            "message" to "Estilo de Recibo do Cliente Configurado!",
+                            "data" to null
+                        )
+                    )
+                }
+            } catch (e: PlugPagException) {
+                CoroutineHelper.launchMain(scope) {
+                    logger.error("setPlugPagCustomPrinterLayout (PlugPagException)", "Erro ao Configurar Estilo de Recibo do Cliente: ${e.message}")
+                    result.success(
+                        mapOf(
+                            "success" to false,
+                            "message" to "Erro ao Configurar Estilo de Recibo do Cliente!",
+                            "data" to null
+                        )
+                    )
                 }
             }
         }

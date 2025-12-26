@@ -19,6 +19,8 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagUserDataResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.exception.PlugPagException
+import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagStyleData
+import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagSetStylesListener
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
 
@@ -96,6 +98,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                                     "data" to null
                                 ))
                             }
+                            plugPag.disposeSubscriber()
                         }
                     }
 
@@ -107,6 +110,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                                 "message" to "$errorMessage",
                                 "data" to null
                             ))
+                            plugPag.disposeSubscriber()
                         }
                     }
                 }
@@ -119,6 +123,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     "message" to "Erro na Autenticação!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -205,6 +210,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     override fun onActivationProgress(eventData: PlugPagEventData) {
                         CoroutineHelper.launchMain(scope) {
                             logger.info("asyncInitPinPad (onActivationProgress)", "Ativando PinPad | Id: ${eventData.eventCode} | ${eventData.customMessage}")
+                            plugPag.disposeSubscriber()
                         }
                     }
 
@@ -216,6 +222,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                                 "message" to "PinPad Ativado com Sucesso!",
                                 "data" to null
                             ))
+                            plugPag.disposeSubscriber()
                         }
                     }
 
@@ -227,6 +234,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                                 "message" to "${initializationResult.errorMessage} (${initializationResult.errorCode})",
                                 "data" to null
                             ))
+                            plugPag.disposeSubscriber()
                         }
                     }
                 }
@@ -239,6 +247,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     "message" to "Erro ao Ativar PinPad!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -281,7 +290,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     result.success(
                         mapOf(
                             "success" to false,
-                            "message" to "Erro Fatal ao Obter Dados do Usuário!",
+                            "message" to "Erro ao Obter Dados do Usuário!",
                             "data" to null
                         )
                     )
@@ -328,7 +337,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     result.success(
                         mapOf(
                             "success" to false,
-                            "message" to "Erro Fatal ao Obter Número de Série!",
+                            "message" to "Erro ao Obter Número de Série!",
                             "data" to null
                         )
                     )
@@ -359,7 +368,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                     result.success(
                         mapOf(
                             "success" to false,
-                            "message" to "Erro Fatal ao Reiniciar Maquininha!",
+                            "message" to "Erro ao Reiniciar Maquininha!",
                             "data" to null
                         )
                     )
@@ -369,51 +378,179 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
     }
 
     /** Verifica se o Serviço da PagSeguro está Livre **/
-    fun isServiceNotBusy(result: MethodChannel.Result) {
+    fun isServiceBusy(result: MethodChannel.Result) {
         CoroutineHelper.launchIO(scope) {
             try {
                 val isBusy = plugPag.isServiceBusy()
 
                 CoroutineHelper.launchMain(scope) {
-                    if (isBusy == true) {
-                        logger.info("isServiceBusy (isBusy == true)", "Serviço da PagSeguro Ocupado")
-                        result.success(
-                            mapOf(
-                                "success" to false,
-                                "message" to "Serviço da PagSeguro Ocupado!",
-                                "data" to null
-                            )
+                    result.success(
+                        mapOf(
+                            "success" to true,
+                            "message" to if (isBusy)
+                                "Serviço da PagSeguro Ocupado!"
+                            else
+                                "Serviço da PagSeguro Livre!",
+                            "data" to isBusy
                         )
-                    } else if (isBusy == false) {
-                        logger.info("isServiceBusy (isBusy == false)", "Serviço da PagSeguro Livre")
+                    )
+                }
+            } catch (e: PlugPagException) {
+                CoroutineHelper.launchMain(scope) {
+                    result.success(
+                        mapOf(
+                            "success" to false,
+                            "message" to "Erro ao Verificar Serviço da PagSeguro!",
+                            "data" to null
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona **/
+    fun setStyleData(call: MethodCall, result: MethodChannel.Result) {
+        // Valores Default
+        fun getColor(key: String, defaultValue: Int): Int {
+            return call.argument<Number>(key)?.toInt() ?: defaultValue
+        }
+
+        val styleData = PlugPagStyleData(
+            headTextColor = getColor("headTextColor", 0x1),
+            headBackgroundColor = getColor("headBackgroundColor", 0xE13C70),
+            contentTextColor = getColor("contentTextColor", 0xDFDFE0),
+            contentTextValue1Color = getColor("contentTextValue1Color", 0xFFE000),
+            contentTextValue2Color = getColor("contentTextValue2Color", 0x100000),
+            positiveButtonTextColor = getColor("positiveButtonTextColor", 0x1),
+            positiveButtonBackground = getColor("positiveButtonBackground", 0xFF358C),
+            negativeButtonTextColor = getColor("negativeButtonTextColor", 0x777778),
+            negativeButtonBackground = getColor("negativeButtonBackground", 0x00FFFFFF),
+            genericButtonBackground = getColor("genericButtonBackground", 0x1),
+            genericButtonTextColor = getColor("genericButtonTextColor", 0xFF358C),
+            genericSmsEditTextBackground = getColor("genericSmsEditTextBackground", 0x1),
+            genericSmsEditTextTextColor = getColor("genericSmsEditTextTextColor", 0xFF358C),
+            lineColor = getColor("lineColor", 0x1000000)
+        )
+
+        CoroutineHelper.launchIO(scope) {
+            try {
+                val applied = plugPag.setStyleData(styleData)
+
+                CoroutineHelper.launchMain(scope) {
+                    if (applied) {
+                        logger.info("setStyleData", "Estilo de Janelas Configurado!")
                         result.success(
                             mapOf(
                                 "success" to true,
-                                "message" to "Serviço da PagSeguro Livre!",
-                                "data" to null
+                                "message" to "Estilo de Janelas Configurado!",
+                                "data" to true
                             )
                         )
                     } else {
-                        logger.error("isServiceBusy (isBusy == null)", "Falha ao Verificar Serviço da PagSeguro")
+                        logger.error("setStyleData", "Falha ao Configurar Estilo de Janelas!")
                         result.success(
                             mapOf(
                                 "success" to false,
-                                "message" to "Falha ao Verificar Serviço da PagSeguro.",
-                                "data" to null
+                                "message" to "Falha ao Configurar Estilo de Janelas!",
+                                "data" to false
                             )
                         )
                     }
                 }
             } catch (e: PlugPagException) {
                 CoroutineHelper.launchMain(scope) {
-                    logger.error("isServiceBusy (PlugPagException)", "Erro ao Verificar Serviço da PagSeguro: ${e.message}")
+                    logger.error("setStyleData (PlugPagException)", "Erro ao Configurar Estilo de Janelas: ${e.message}")
+                    result.success(mapOf(
+                        "success" to false,
+                        "message" to "Erro ao Configurar Estilo de Janelas!",
+                        "data" to null
+                    ))
+                }
+            }
+        }
+    }
+
+    /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Assíncrona **/
+    fun asyncSetStyles(call: MethodCall, result: MethodChannel.Result) {
+        fun getColor(key: String, defaultValue: Int): Int {
+            return call.argument<Number>(key)?.toInt() ?: defaultValue
+        }
+
+        val styleData = PlugPagStyleData(
+            headTextColor = getColor("headTextColor", 0x1),
+            headBackgroundColor = getColor("headBackgroundColor", 0xE13C70),
+            contentTextColor = getColor("contentTextColor", 0xDFDFE0),
+            contentTextValue1Color = getColor("contentTextValue1Color", 0xFFE000),
+            contentTextValue2Color = getColor("contentTextValue2Color", 0x100000),
+            positiveButtonTextColor = getColor("positiveButtonTextColor", 0x1),
+            positiveButtonBackground = getColor("positiveButtonBackground", 0xFF358C),
+            negativeButtonTextColor = getColor("negativeButtonTextColor", 0x777778),
+            negativeButtonBackground = getColor("negativeButtonBackground", 0x00FFFFFF),
+            genericButtonBackground = getColor("genericButtonBackground", 0x1),
+            genericButtonTextColor = getColor("genericButtonTextColor", 0xFF358C),
+            genericSmsEditTextBackground = getColor("genericSmsEditTextBackground", 0x1),
+            genericSmsEditTextTextColor = getColor("genericSmsEditTextTextColor", 0xFF358C),
+            lineColor = getColor("lineColor", 0x1000000)
+        )
+
+        CoroutineHelper.launchIO(scope) {
+            try {
+                plugPag.asyncSetStyles(
+                    styleData = styleData,
+                    isSetStylesListener = object : PlugPagSetStylesListener {
+
+                        override fun onSetStylesFinished(setStylesResult: Boolean) {
+                            CoroutineHelper.launchMain(scope) {
+                                if (setStylesResult) {
+                                    logger.info("asyncSetStyles (onSetStylesFinished)", "Estilo de Janelas Configurado!")
+                                    result.success(
+                                        mapOf(
+                                            "success" to true,
+                                            "message" to "Estilo de Janelas Configurado!",
+                                            "data" to true
+                                        )
+                                    )
+                                } else {
+                                    logger.error("asyncSetStyles (onSetStylesFinished)", "Falha ao Configurar Estilo de Janelas!")
+                                    result.success(
+                                        mapOf(
+                                            "success" to false,
+                                            "message" to "Falha ao Configurar Estilo de Janelas!",
+                                            "data" to false
+                                        )
+                                    )
+                                }
+                                plugPag.disposeSubscriber()
+                            }
+                        }
+
+                        override fun onError(errorMessage: String) {
+                            CoroutineHelper.launchMain(scope) {
+                                logger.error("asyncSetStyles (onError)", "Erro ao Configurar Estilo de Janelas: $errorMessage")
+                                result.success(
+                                    mapOf(
+                                        "success" to false,
+                                        "message" to errorMessage,
+                                        "data" to null
+                                    )
+                                )
+                                plugPag.disposeSubscriber()
+                            }
+                        }
+                    }
+                )
+            } catch (e: PlugPagException) {
+                CoroutineHelper.launchMain(scope) {
+                    logger.error("asyncSetStyles (PlugPagException)", "Erro ao Configurar Estilo de Janelas: ${e.message}")
                     result.success(
                         mapOf(
                             "success" to false,
-                            "message" to "Erro Fatal ao Verificar Serviço da PagSeguro!",
+                            "message" to "Erro ao Configurar Estilo de Janelas!",
                             "data" to null
                         )
                     )
+                    plugPag.disposeSubscriber()
                 }
             }
         }

@@ -23,6 +23,8 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagVoidData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventListener
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
+import java.math.BigDecimal
+import java.math.RoundingMode
 
 /** Gerencia todas as operações de pagamento **/
 class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineScope) {
@@ -45,7 +47,10 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
         abortRequested = false
 
         val amount = call.argument<Double>("amount") ?: 0.0
-        val amountInCents = (amount * 100).toInt()
+        val amountInCents = BigDecimal.valueOf(amount)
+            .multiply(BigDecimal(100))
+            .setScale(0, RoundingMode.HALF_UP)
+            .toInt()
 
         val type = call.argument<Int>("type") ?: PlugPag.TYPE_CREDITO
         var installmentType = call.argument<Int>("installmentType") ?: PlugPag.INSTALLMENT_TYPE_A_VISTA
@@ -162,7 +167,10 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
             abortRequested = false
 
             val amount = call.argument<Double>("amount") ?: 0.0
-            val amountInCents = (amount * 100).toInt()
+            val amountInCents = BigDecimal.valueOf(amount)
+                .multiply(BigDecimal(100))
+                .setScale(0, RoundingMode.HALF_UP)
+                .toInt()
 
             val type = call.argument<Int>("type") ?: PlugPag.TYPE_CREDITO
             var installmentType = call.argument<Int>("installmentType") ?: PlugPag.INSTALLMENT_TYPE_A_VISTA
@@ -220,11 +228,14 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                 override fun onPaymentProgress(eventData: PlugPagEventData) {
                     CoroutineHelper.launchMain(scope) {
                         logger.info("doAsyncPayment (onPaymentProgress)", "Realizando Pagamento | Id: ${eventData.eventCode} | ${eventData.customMessage}")
-                        plugPagChannel?.invokeMethod("onPaymentProgress", mapOf(
-                            "eventCode" to eventData.eventCode,
-                            "message" to eventData.customMessage,
-                            "data" to null
-                        ))
+                        plugPagChannel?.invokeMethod(
+                                "onPaymentProgress", mapOf(
+                                "eventCode" to eventData.eventCode,
+                                "message" to eventData.customMessage,
+                                "data" to null
+                            )
+                        )
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -237,6 +248,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "Pagamento Realizado com Sucesso!",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -258,18 +270,21 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                                 "data" to map
                             ))
                         }
+                        plugPag.disposeSubscriber()
                     }
                 }
 
                 override fun onPrinterSuccess(printerResult: PlugPagPrintResult) {
                     CoroutineHelper.launchMain(scope) {
                         logger.info("doAsyncPayment (onPrinterSuccess)", "Impressão de Recibo com Sucesso | Id: ${printerResult.errorCode}")
+                        plugPag.disposeSubscriber()
                     }
                 }
 
                 override fun onPrinterError(printerResult: PlugPagPrintResult) {
                     CoroutineHelper.launchMain(scope) {
                         logger.warn("doAsyncPayment (onPrinterError)", "Erro na Impressão do Recibo | Id: ${printerResult.errorCode}")
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -281,6 +296,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro Fatal ao Realizar Pagamento!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -356,18 +372,20 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                                 "data" to null
                             ))
                         }
+                        plugPag.disposeSubscriber()
                     }
                 }
 
                 override fun onError(errorMessage: String) {
-                    abortRequested = false
                     CoroutineHelper.launchMain(scope) {
+                        abortRequested = false
                         logger.error("asyncAbortTransaction (onError)", "Erro ao Cancelar Transação: $errorMessage")
                         result.success(mapOf(
                             "success" to false,
                             "message" to "$errorMessage",
                             "data" to null
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -380,6 +398,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro Fatal ao Solicitar Cancelamento!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -546,11 +565,14 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                 override fun onPaymentProgress(eventData: PlugPagEventData) {
                     CoroutineHelper.launchMain(scope) {
                         logger.info("asyncVoidPayment (onPaymentProgress)", "Realizando Estorno | Id: ${eventData.eventCode} | ${eventData.customMessage}")
-                        plugPagChannel?.invokeMethod("onPaymentProgress", mapOf(
-                            "eventCode" to eventData.eventCode,
-                            "message" to eventData.customMessage,
-                            "data" to null
-                        ))
+                        plugPagChannel?.invokeMethod(
+                            "onPaymentProgress", mapOf(
+                                "eventCode" to eventData.eventCode,
+                                "message" to eventData.customMessage,
+                                "data" to null
+                            )
+                        )
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -563,6 +585,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "Estorno Realizado com Sucesso!",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -584,18 +607,21 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                                 "data" to map
                             ))
                         }
+                        plugPag.disposeSubscriber()
                     }
                 }
 
                 override fun onPrinterSuccess(printerResult: PlugPagPrintResult) {
                     CoroutineHelper.launchMain(scope) {
                         logger.info("asyncVoidPayment (onPrinterSuccess)", "Impressão de Recibo com Sucesso | Id: ${printerResult.errorCode}")
+                        plugPag.disposeSubscriber()
                     }
                 }
 
                 override fun onPrinterError(printerResult: PlugPagPrintResult) {
                     CoroutineHelper.launchMain(scope) {
                         logger.warn("asyncVoidPayment (onPrinterError)", "Erro na Impressão do Recibo | Id: ${printerResult.errorCode}")
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -607,6 +633,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro ao Realizar Estorno!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }
@@ -667,6 +694,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "Última Transação encontrada com Sucesso!",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
 
@@ -679,6 +707,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                             "message" to "${transactionResult.message} (${transactionResult.errorCode})",
                             "data" to map
                         ))
+                        plugPag.disposeSubscriber()
                     }
                 }
             })
@@ -691,6 +720,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     "message" to "Erro ao Buscar Última Transação!",
                     "data" to null
                 ))
+                plugPag.disposeSubscriber()
             }
         }
     }

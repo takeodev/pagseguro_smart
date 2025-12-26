@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pagseguro_smart/pagseguro_smart.dart';
 
@@ -104,7 +105,58 @@ class PagSeguroService {
   Future<Map<String, dynamic>> asyncInitPinPad(String activationCode) =>
       _invokeNative('asyncInitPinPad', {'activationCode': activationCode});
 
-  /// Realiza o pagamento
+  /// Configura Estilo (Cores) de Impressão de Recibo
+  Future<Map<String, dynamic>> setStyleData({
+    bool isAsync = false,
+    Color? headTextColor,
+    Color? headBackgroundColor,
+    Color? contentTextColor,
+    Color? contentTextValue1Color,
+    Color? contentTextValue2Color,
+    Color? positiveButtonTextColor,
+    Color? positiveButtonBackground,
+    Color? negativeButtonTextColor,
+    Color? negativeButtonBackground,
+    Color? genericButtonBackground,
+    Color? genericButtonTextColor,
+    Color? genericSmsEditTextBackground,
+    Color? genericSmsEditTextTextColor,
+    Color? lineColor,
+  }) =>
+      _invokeNative(
+        isAsync ? 'asyncSetStyles' : 'setStyleData',
+        {
+          'headTextColor': (headTextColor ?? Colors.black).toARGB32(),
+          'headBackgroundColor':
+              (headBackgroundColor ?? const Color(0xFFE13C70)).toARGB32(),
+          'contentTextColor':
+              (contentTextColor ?? const Color(0xFFDFDFE0)).toARGB32(),
+          'contentTextValue1Color':
+              (contentTextValue1Color ?? const Color(0xFFFFE000)).toARGB32(),
+          'contentTextValue2Color':
+              (contentTextValue2Color ?? Colors.black).toARGB32(),
+          'positiveButtonTextColor':
+              (positiveButtonTextColor ?? Colors.black).toARGB32(),
+          'positiveButtonBackground':
+              (positiveButtonBackground ?? const Color(0xFFFF358C)).toARGB32(),
+          'negativeButtonTextColor':
+              (negativeButtonTextColor ?? const Color(0xFF777778)).toARGB32(),
+          'negativeButtonBackground':
+              (negativeButtonBackground ?? Colors.black).toARGB32(),
+          'genericButtonBackground':
+              (genericButtonBackground ?? Colors.black).toARGB32(),
+          'genericButtonTextColor':
+              (genericButtonTextColor ?? const Color(0xFFFF358C)).toARGB32(),
+          'genericSmsEditTextBackground':
+              (genericSmsEditTextBackground ?? Colors.black).toARGB32(),
+          'genericSmsEditTextTextColor':
+              (genericSmsEditTextTextColor ?? const Color(0xFFFF358C))
+                  .toARGB32(),
+          'lineColor': (lineColor ?? Colors.black).toARGB32(),
+        },
+      );
+
+  /// Realiza o Pagamento
   Future<Map<String, dynamic>> doPayment({
     required int type,
     required double value,
@@ -187,8 +239,8 @@ class PagSeguroService {
   Future<Map<String, dynamic>> rebootDevice() => _invokeNative('rebootDevice');
 
   /// Verifica se o Serviço da PagSeguro está Livre
-  Future<Map<String, dynamic>> isServiceNotBusy() =>
-      _invokeNative('isServiceNotBusy');
+  Future<Map<String, dynamic>> isServiceBusy() =>
+      _invokeNative('isServiceBusy');
 
   /// Reimpressão de Recibo: Via do Cliente
   Future<Map<String, dynamic>> reprintCustomerReceipt() =>
@@ -207,4 +259,46 @@ class PagSeguroService {
           {required String transactionCode, required String phoneNumber}) =>
       _invokeNative('sendReceiptSMS',
           {'phoneNumber': phoneNumber, 'transactionCode': transactionCode});
+
+  /// Configura Ações de Impressão de Recibo
+  Future<Map<String, dynamic>> setPrintActionListener({
+    bool askCustomerReceipt = false,
+    bool smsReceipt = false,
+  }) =>
+      _invokeNative('setPrintActionListener', {
+        'askCustomerReceipt': askCustomerReceipt,
+        'smsReceipt': smsReceipt,
+      });
+
+  /// Define Estilo Visual (Cores e Texto) do Recibo do Cliente
+  Future<Map<String, dynamic>> setPlugPagCustomPrinterLayout(
+    String title, {
+    Color? titleColor,
+    Color? confirmTextColor,
+    Color? cancelTextColor,
+    Color? windowBackgroundColor,
+    Color? buttonBackgroundColor,
+    Color? buttonBackgroundColorDisabled,
+    Color? sendSMSTextColor,
+    int maxTimeShowPopup = 10,
+  }) =>
+      _invokeNative(
+        'setPlugPagCustomPrinterLayout',
+        {
+          'title': title,
+          'titleColor': (titleColor ?? const Color(0xFFFFE000)).toARGB32(),
+          'confirmTextColor': (confirmTextColor ?? Colors.black).toARGB32(),
+          'cancelTextColor':
+              (cancelTextColor ?? const Color(0xFF777778)).toARGB32(),
+          'windowBackgroundColor':
+              (windowBackgroundColor ?? const Color(0xFFE13C70)).toARGB32(),
+          'buttonBackgroundColor':
+              (buttonBackgroundColor ?? Colors.black).toARGB32(),
+          'buttonBackgroundColorDisabled':
+              (buttonBackgroundColorDisabled ?? Colors.black).toARGB32(),
+          'sendSMSTextColor':
+              (sendSMSTextColor ?? const Color(0xFFFFE000)).toARGB32(),
+          'maxTimeShowPopup': maxTimeShowPopup,
+        },
+      );
 }

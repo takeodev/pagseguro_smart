@@ -19,8 +19,6 @@ class PaymentTab extends StatefulWidget {
 }
 
 class _PaymentTabState extends State<PaymentTab> {
-  bool _isActive = false;
-
   final TextEditingController activationCodeController = TextEditingController(
     text: '749879',
   );
@@ -29,17 +27,6 @@ class _PaymentTabState extends State<PaymentTab> {
     leftSymbol: 'R\$ ',
     decimalSeparator: ',',
   );
-
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final PaymentProvider payProv = context.read<PaymentProvider>();
-      final isActive = await payProv.isAuthenticated();
-      setState(() => _isActive = isActive);
-    });
-  }
 
   @override
   void dispose() {
@@ -57,7 +44,7 @@ class _PaymentTabState extends State<PaymentTab> {
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
-          if (!payProv.isActivated || !_isActive)
+          if (!payProv.isActivated)
             Card(
               elevation: 3,
               child: Padding(
@@ -105,7 +92,7 @@ class _PaymentTabState extends State<PaymentTab> {
             ),
 
           // CARD PAGAMENTO
-          if (_isActive)
+          if (payProv.isActivated)
             Card(
               elevation: 3,
               child: Padding(
