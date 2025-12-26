@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 /// Modelo de Dados de Transação / Pagamento (PlugPagTransactionResult)
 /// Documentação: https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/-wrapper-p-p-s/br.com.uol.pagseguro.plugpagservice.wrapper/-plug-pag-transaction-result/index.html
 class TransactionDataModel {
@@ -198,6 +200,5 @@ class TransactionDataModel {
     }
   }
 
-  @override
-  String toString() => toJson().toString();
+  String toJsonString() => jsonEncode(toJson());
 }

@@ -1,8 +1,12 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.2
+
+- [Add] Dentro de "**TransactionDataModel**" adicionada funcionalidade "_toJsonString()_".
+
 ## 1.2.1
 
-- [Add] Método de Pagamento "_tMoney_" em "**Constants** > _PagSeguroEnum_" para Uso Interno.
+- [Add] Método de Pagamento "_tMoney_" em "**Constants**" e "_PagSeguroEnum_" para Uso Interno.
 
 ## 1.2.0
 
