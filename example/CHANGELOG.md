@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.11
+
+- [Add] Opção de Impressão de Recibo do Cliente de forma direta, sem perguntar.
+
 ## 1.0.10
 
 - [Add] Utilização de Layout "_pagSeguro_".

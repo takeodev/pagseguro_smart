@@ -252,12 +252,14 @@ class PagSeguroService {
 
   /// Configura Ações de Impressão de Recibo
   Future<Map<String, dynamic>> setPrintActionListener({
-    bool askCustomerReceipt = false,
+    bool askReceipt = true,
     bool smsReceipt = false,
+    bool directReceipt = false,
   }) =>
       _invokeNative('setPrintActionListener', {
-        'askCustomerReceipt': askCustomerReceipt,
+        'askReceipt': askReceipt,
         'smsReceipt': smsReceipt,
+        'directReceipt': directReceipt,
       });
 
   /// Define Estilo Visual (Cores e Texto) do Recibo do Cliente

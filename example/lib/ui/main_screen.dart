@@ -33,7 +33,7 @@ class _MainScreenState extends State<MainScreen> {
         layoutPreset: LayoutPreset.darkBlue,
         maxTimeShowPopup: 15,
       );
-      await payProv.setPrintActionListener(askCustomerReceipt: true);
+      await payProv.setPrintActionListener(askReceipt: true);
     });
   }
 

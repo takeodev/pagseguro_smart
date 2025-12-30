@@ -305,8 +305,9 @@ Definir Ação de Impressão do Recibo do **Cliente**:
 
 ```dart
 await pagSeguro.setPrintActionListener(
-    askCustomerReceipt: true,
+    askReceipt: true,
     smsReceipt: false,
+    directReceipt: false,
 );
 ```
 

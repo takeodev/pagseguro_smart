@@ -30,6 +30,7 @@ class PaymentProvider extends ChangeNotifier {
   LayoutPreset? actualPreset;
   bool askPrint = true;
   bool smsPrint = false;
+  bool directPrint = false;
 
   // Dados a Serem Exibidos
   String displayMessage = '';
@@ -552,8 +553,9 @@ class PaymentProvider extends ChangeNotifier {
   // CONFIGURAR IMPRESSÃO DE RECIBO DO CLIENTE
   // ============================================================
   Future<void> setPrintActionListener({
-    bool askCustomerReceipt = true,
+    bool askReceipt = true,
     bool smsReceipt = false,
+    bool directReceipt = false,
   }) async {
     if (isTapped) return;
     isTapped = true;
@@ -566,18 +568,21 @@ class PaymentProvider extends ChangeNotifier {
 
     try {
       final result = await pagSeguro.setPrintActionListener(
-        askCustomerReceipt: askCustomerReceipt,
+        askReceipt: askReceipt,
         smsReceipt: smsReceipt,
+        directReceipt: directReceipt,
       );
 
       message = result['message'] ?? '';
-      askPrint = askCustomerReceipt;
+      askPrint = askReceipt;
       smsPrint = smsReceipt;
+      directPrint = directReceipt;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
       askPrint = true;
       smsPrint = false;
+      directPrint = false;
       message = 'Erro ao Configurar Recibo do Cliente!';
       displayMessage = '$message\n$e';
     } finally {

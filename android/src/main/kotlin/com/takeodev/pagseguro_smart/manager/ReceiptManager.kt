@@ -293,9 +293,9 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Configura Ações de Impressão de Recibo **/
     fun setPrintActionListener(call: MethodCall, result: MethodChannel.Result) {
-        val askCustomerReceipt = call.argument<Boolean>("askCustomerReceipt") ?: false
+        val askReceipt = call.argument<Boolean>("askReceipt") ?: false
         val smsReceipt = call.argument<Boolean>("smsReceipt") ?: false
-        // val printReceipt = call.argument<Boolean>("printReceipt") ?: false
+        val directReceipt = call.argument<Boolean>("directReceipt") ?: false
 
         CoroutineHelper.launchIO(scope) {
             try {
@@ -308,26 +308,24 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                         CoroutineHelper.launchMain(scope) {
                             val transactionId = transactionResult?.transactionId
                             logger.info("setPrintActionListener (onPrint)", "Interceptando Impressão de Recibo | Id: $transactionId")
+                            logger.info("setPrintActionListener (onPrint)", "askReceipt: $askReceipt | smsReceipt: $smsReceipt | directReceipt: $directReceipt")
 
-                            when {
+                            if (askReceipt) {
                                 // Exibe a tela de diálogo de envio ou impressão de comprovante (via do cliente).
-                                askCustomerReceipt -> { onFinishActions?.showPopup(plugPag) }
-
+                                onFinishActions?.showPopup(plugPag)
+                            } else if (smsReceipt) {
                                 // Realiza o envio do comprovante de transação (via do cliente) por SMS.
-                                smsReceipt -> {
-                                    if (!phoneNumber.isNullOrBlank()) {
-                                        onFinishActions?.sendSMS(plugPag, phoneNumber)
-                                    } else {
-                                        logger.warn("setPrintActionListener (phoneNumber.isNullOrBlank)", "Número de Telefone Inválido para SMS!")
-                                        onFinishActions?.showPopup(plugPag)
-                                    }
+                                if (!phoneNumber.isNullOrBlank()) {
+                                    onFinishActions?.sendSMS(plugPag, phoneNumber)
+                                } else {
+                                    logger.warn("setPrintActionListener (phoneNumber.isNullOrBlank)", "Número de Telefone Inválido para SMS!")
+                                    onFinishActions?.showPopup(plugPag)
                                 }
-
+                            } else if (directReceipt) {
                                 // Realiza a impressão do comprovante de transação (via do cliente).
-                                // printReceipt -> { onFinishActions?.doPrint(plugPag) }
-
-                                // Dispensa o envio e a impressão do comprovante (via do cliente).
-                                else -> { onFinishActions?.doNothing(plugPag) }
+                                onFinishActions?.doPrint(plugPag)
+                            } else {
+                                onFinishActions?.doNothing(plugPag)
                             }
                         }
                     }

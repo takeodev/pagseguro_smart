@@ -1,11 +1,15 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.5
+
+- [Add] Em "**setPlugPagCustomPrinterLayout**" adicionado parâmetro para Impressão Direta do Recibo de Cliente (sem perguntar).
+- [Improve] Atualizado README.
+
 ## 1.2.4
 
 - [Remove] Em "**LayoutPreset**", Layout "_blackPink_".
 - [Add] Em "**LayoutPreset**" novo Layout "_pagSeguro_".
 - [Improve] Em "**PagSeguroService**" e "_setStyleData_" ou "_setPlugPagCustomPrinterLayout_" todos os parâmetros opcionais.
-- 
 
 ## 1.2.3
 

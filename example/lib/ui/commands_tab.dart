@@ -130,7 +130,7 @@ class CommandsTab extends StatelessWidget {
                         icon: const Icon(Icons.question_mark_rounded),
                         onPressed: payProv.isActivated && !payProv.askPrint
                             ? () => payProv.setPrintActionListener(
-                                askCustomerReceipt: true,
+                                askReceipt: true,
                               )
                             : null,
                         label: const Text('Perguntar'),
@@ -145,11 +145,24 @@ class CommandsTab extends StatelessWidget {
                         label: const Text('Via SMS'),
                       ),
                       ElevatedButton.icon(
+                        icon: const Icon(Icons.mark_chat_read_rounded),
+                        onPressed: payProv.isActivated && !payProv.directPrint
+                            ? () => payProv.setPrintActionListener(
+                                directReceipt: true,
+                              )
+                            : null,
+                        label: const Text('Direto'),
+                      ),
+                      ElevatedButton.icon(
                         icon: const Icon(Icons.print_disabled),
                         onPressed:
                             payProv.isActivated &&
                                 (payProv.askPrint || payProv.smsPrint)
-                            ? () => payProv.setPrintActionListener()
+                            ? () => payProv.setPrintActionListener(
+                                askReceipt: false,
+                                smsReceipt: false,
+                                directReceipt: false,
+                              )
                             : null,
                         label: const Text('Sem Recibo'),
                       ),
