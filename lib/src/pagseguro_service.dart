@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pagseguro_smart/pagseguro_smart.dart';
 
@@ -126,33 +125,22 @@ class PagSeguroService {
       _invokeNative(
         isAsync ? 'asyncSetStyles' : 'setStyleData',
         {
-          'headTextColor': (headTextColor ?? Colors.black).toARGB32(),
-          'headBackgroundColor':
-              (headBackgroundColor ?? const Color(0xFFE13C70)).toARGB32(),
-          'contentTextColor':
-              (contentTextColor ?? const Color(0xFFDFDFE0)).toARGB32(),
-          'contentTextValue1Color':
-              (contentTextValue1Color ?? const Color(0xFFFFE000)).toARGB32(),
-          'contentTextValue2Color':
-              (contentTextValue2Color ?? Colors.black).toARGB32(),
-          'positiveButtonTextColor':
-              (positiveButtonTextColor ?? Colors.black).toARGB32(),
-          'positiveButtonBackground':
-              (positiveButtonBackground ?? const Color(0xFFFF358C)).toARGB32(),
-          'negativeButtonTextColor':
-              (negativeButtonTextColor ?? const Color(0xFF777778)).toARGB32(),
-          'negativeButtonBackground':
-              (negativeButtonBackground ?? Colors.black).toARGB32(),
-          'genericButtonBackground':
-              (genericButtonBackground ?? Colors.black).toARGB32(),
-          'genericButtonTextColor':
-              (genericButtonTextColor ?? const Color(0xFFFF358C)).toARGB32(),
+          'headTextColor': headTextColor?.toARGB32(),
+          'headBackgroundColor': headBackgroundColor?.toARGB32(),
+          'contentTextColor': contentTextColor?.toARGB32(),
+          'contentTextValue1Color': contentTextValue1Color?.toARGB32(),
+          'contentTextValue2Color': contentTextValue2Color?.toARGB32(),
+          'positiveButtonTextColor': positiveButtonTextColor?.toARGB32(),
+          'positiveButtonBackground': positiveButtonBackground?.toARGB32(),
+          'negativeButtonTextColor': negativeButtonTextColor?.toARGB32(),
+          'negativeButtonBackground': negativeButtonBackground?.toARGB32(),
+          'genericButtonBackground': genericButtonBackground?.toARGB32(),
+          'genericButtonTextColor': genericButtonTextColor?.toARGB32(),
           'genericSmsEditTextBackground':
-              (genericSmsEditTextBackground ?? Colors.black).toARGB32(),
+              genericSmsEditTextBackground?.toARGB32(),
           'genericSmsEditTextTextColor':
-              (genericSmsEditTextTextColor ?? const Color(0xFFFF358C))
-                  .toARGB32(),
-          'lineColor': (lineColor ?? Colors.black).toARGB32(),
+              genericSmsEditTextTextColor?.toARGB32(),
+          'lineColor': lineColor?.toARGB32(),
         },
       );
 
@@ -273,8 +261,8 @@ class PagSeguroService {
       });
 
   /// Define Estilo Visual (Cores e Texto) do Recibo do Cliente
-  Future<Map<String, dynamic>> setPlugPagCustomPrinterLayout(
-    String title, {
+  Future<Map<String, dynamic>> setPlugPagCustomPrinterLayout({
+    String? title,
     Color? titleColor,
     Color? confirmTextColor,
     Color? cancelTextColor,
@@ -282,24 +270,20 @@ class PagSeguroService {
     Color? buttonBackgroundColor,
     Color? buttonBackgroundColorDisabled,
     Color? sendSMSTextColor,
-    int maxTimeShowPopup = 10,
+    int maxTimeShowPopup = 20,
   }) =>
       _invokeNative(
         'setPlugPagCustomPrinterLayout',
         {
           'title': title,
-          'titleColor': (titleColor ?? const Color(0xFFFFE000)).toARGB32(),
-          'confirmTextColor': (confirmTextColor ?? Colors.black).toARGB32(),
-          'cancelTextColor':
-              (cancelTextColor ?? const Color(0xFF777778)).toARGB32(),
-          'windowBackgroundColor':
-              (windowBackgroundColor ?? const Color(0xFFE13C70)).toARGB32(),
-          'buttonBackgroundColor':
-              (buttonBackgroundColor ?? Colors.black).toARGB32(),
+          'titleColor': titleColor?.toARGB32(),
+          'confirmTextColor': confirmTextColor?.toARGB32(),
+          'cancelTextColor': cancelTextColor?.toARGB32(),
+          'windowBackgroundColor': windowBackgroundColor?.toARGB32(),
+          'buttonBackgroundColor': buttonBackgroundColor?.toARGB32(),
           'buttonBackgroundColorDisabled':
-              (buttonBackgroundColorDisabled ?? Colors.black).toARGB32(),
-          'sendSMSTextColor':
-              (sendSMSTextColor ?? const Color(0xFFFFE000)).toARGB32(),
+              buttonBackgroundColorDisabled?.toARGB32(),
+          'sendSMSTextColor': sendSMSTextColor?.toARGB32(),
           'maxTimeShowPopup': maxTimeShowPopup,
         },
       );

@@ -1,5 +1,12 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.4
+
+- [Remove] Em "**LayoutPreset**", Layout "_blackPink_".
+- [Add] Em "**LayoutPreset**" novo Layout "_pagSeguro_".
+- [Improve] Em "**PagSeguroService**" e "_setStyleData_" ou "_setPlugPagCustomPrinterLayout_" todos os parâmetros opcionais.
+- 
+
 ## 1.2.3
 
 - [Add] Em "**Constants**" adicionada utilitário "_cardPayments_".

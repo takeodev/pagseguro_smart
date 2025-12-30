@@ -377,15 +377,15 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
     /** Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona **/
     fun setPlugPagCustomPrinterLayout(call: MethodCall, result: MethodChannel.Result) {
         val layout = PlugPagCustomPrinterLayout(
-            title = Util.callString(call, "title", "Comprovante"),
-            titleColor = Util.callHex(call, "titleColor", "#FFFFE000"),
-            confirmTextColor = Util.callHex(call, "confirmTextColor", "#FFFFFFFF"),
-            cancelTextColor = Util.callHex(call, "cancelTextColor", "#FF777778"),
-            windowBackgroundColor = Util.callHex(call, "windowBackgroundColor", "#FFE13C70"),
-            buttonBackgroundColor = Util.callHex(call, "buttonBackgroundColor", "#FF000000"),
-            buttonBackgroundColorDisabled = Util.callHex(call, "buttonBackgroundColorDisabled", "#FFBDBDBD"),
-            sendSMSTextColor = Util.callHex(call, "sendSMSTextColor", "#FFFFE000"),
-            maxTimeShowPopup = Util.callInt(call, "maxTimeShowPopup", 10)
+            title = Util.callString(call, "title"),
+            titleColor = Util.callHex(call, "titleColor"),
+            confirmTextColor = Util.callHex(call, "confirmTextColor"),
+            cancelTextColor = Util.callHex(call, "cancelTextColor"),
+            windowBackgroundColor = Util.callHex(call, "windowBackgroundColor"),
+            buttonBackgroundColor = Util.callHex(call, "buttonBackgroundColor"),
+            buttonBackgroundColorDisabled = Util.callHex(call, "buttonBackgroundColorDisabled"),
+            sendSMSTextColor = Util.callHex(call, "sendSMSTextColor"),
+            maxTimeShowPopup = Util.callInt(call, "maxTimeShowPopup", 30)
         )
 
         CoroutineHelper.launchIO(scope) {

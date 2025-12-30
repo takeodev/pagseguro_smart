@@ -18,6 +18,7 @@ class PaymentProvider extends ChangeNotifier {
   bool isTapped = false;
   bool isAbortTapped = false;
   bool isServiceTapped = false;
+  bool isStyleTapped = false;
 
   // Estado da Maquininha ou Pagamento
   bool isActivated = false;
@@ -26,10 +27,9 @@ class PaymentProvider extends ChangeNotifier {
   bool isLoading = false;
 
   // Configurações
-  LayoutPreset actualPreset = LayoutPreset.darkBlue;
+  LayoutPreset? actualPreset;
   bool askPrint = true;
   bool smsPrint = false;
-  bool printListener = false;
 
   // Dados a Serem Exibidos
   String displayMessage = '';
@@ -261,45 +261,45 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DE JANELAS PAGSEGURO
   // ============================================================
-  Future<void> setStyleData(LayoutPreset layoutPreset) async {
-    if (isServiceTapped) return;
-    isServiceTapped = true;
+  Future<void> setStyleData(LayoutPreset? layoutPreset) async {
+    if (isTapped) return;
+    isTapped = true;
 
     String message = 'Definindo Estilo...';
     displayMessage = message;
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
-    final style = LayoutPresets.of(layoutPreset);
+    final StyleDataModel? style = LayoutPresets.of(layoutPreset);
 
     try {
       final result = await pagSeguro.setStyleData(
-        headTextColor: style.headTextColor,
-        headBackgroundColor: style.headBackgroundColor,
-        contentTextColor: style.contentTextColor,
-        contentTextValue1Color: style.contentTextValue1Color,
-        contentTextValue2Color: style.contentTextValue2Color,
-        positiveButtonTextColor: style.positiveButtonTextColor,
-        positiveButtonBackground: style.positiveButtonBackground,
-        negativeButtonTextColor: style.negativeButtonTextColor,
-        negativeButtonBackground: style.negativeButtonBackground,
-        genericButtonBackground: style.genericButtonBackground,
-        genericButtonTextColor: style.genericButtonTextColor,
-        genericSmsEditTextBackground: style.genericSmsEditTextBackground,
-        genericSmsEditTextTextColor: style.genericSmsEditTextTextColor,
-        lineColor: style.lineColor,
+        headTextColor: style?.headTextColor,
+        headBackgroundColor: style?.headBackgroundColor,
+        contentTextColor: style?.contentTextColor,
+        contentTextValue1Color: style?.contentTextValue1Color,
+        contentTextValue2Color: style?.contentTextValue2Color,
+        positiveButtonTextColor: style?.positiveButtonTextColor,
+        positiveButtonBackground: style?.positiveButtonBackground,
+        negativeButtonTextColor: style?.negativeButtonTextColor,
+        negativeButtonBackground: style?.negativeButtonBackground,
+        genericButtonBackground: style?.genericButtonBackground,
+        genericButtonTextColor: style?.genericButtonTextColor,
+        genericSmsEditTextBackground: style?.genericSmsEditTextBackground,
+        genericSmsEditTextTextColor: style?.genericSmsEditTextTextColor,
+        lineColor: style?.lineColor,
       );
       message = result['message']!;
       actualPreset = layoutPreset;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      actualPreset = LayoutPreset.darkBlue;
+      actualPreset = null;
       message = 'Erro ao Definir Estilo!';
       displayMessage = '$message\n$e';
     } finally {
       isLoading = false;
-      isServiceTapped = false;
+      isTapped = false;
       notifyListeners();
     }
   }
@@ -552,7 +552,7 @@ class PaymentProvider extends ChangeNotifier {
   // CONFIGURAR IMPRESSÃO DE RECIBO DO CLIENTE
   // ============================================================
   Future<void> setPrintActionListener({
-    bool askCustomerReceipt = false,
+    bool askCustomerReceipt = true,
     bool smsReceipt = false,
   }) async {
     if (isTapped) return;
@@ -590,29 +590,110 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DO RECIBO DO CLIENTE
   // ============================================================
-  Future<void> setPlugPagCustomPrinterLayout(String title) async {
-    if (isServiceTapped) return;
-    isServiceTapped = true;
+  Future<void> setPlugPagCustomPrinterLayout({
+    String? title,
+    LayoutPreset? layoutPreset,
+    int maxTimeShowPopup = 20,
+  }) async {
+    if (isTapped) return;
+    isTapped = true;
 
     String message = 'Definindo Estilo do Recibo...';
     displayMessage = message;
     isLoading = true;
     notifyListeners();
     BotToast.showText(text: message);
+    final StyleDataModel? style = LayoutPresets.of(layoutPreset);
 
     try {
-      final result = await pagSeguro.setPlugPagCustomPrinterLayout(title);
+      final result = await pagSeguro.setPlugPagCustomPrinterLayout(
+        title: title,
+        titleColor: style?.headTextColor,
+        confirmTextColor: style?.positiveButtonTextColor,
+        cancelTextColor: style?.negativeButtonTextColor,
+        windowBackgroundColor: style?.headBackgroundColor,
+        buttonBackgroundColor: style?.positiveButtonBackground,
+        buttonBackgroundColorDisabled: style?.negativeButtonBackground,
+        sendSMSTextColor: style?.genericSmsEditTextTextColor,
+        maxTimeShowPopup: maxTimeShowPopup,
+      );
       message = result['message']!;
-      printListener = true;
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      printListener = false;
       message = 'Erro ao Definir Estilo do Recibo!';
       displayMessage = '$message\n$e';
     } finally {
       isLoading = false;
-      isServiceTapped = false;
+      isTapped = false;
+      notifyListeners();
+    }
+  }
+
+  // ============================================================
+  // ESTILO DE JANELAS PAGSEGURO & JANELA DE RECIBO
+  // ============================================================
+  Future<void> setFullStyleData({
+    String? title,
+    LayoutPreset? layoutPreset,
+    int maxTimeShowPopup = 20,
+  }) async {
+    if (isStyleTapped) return;
+    isStyleTapped = true;
+
+    String message = 'Definindo Estilo Completo...';
+    displayMessage = message;
+    isLoading = true;
+    notifyListeners();
+    BotToast.showText(text: message);
+    final StyleDataModel? style = LayoutPresets.of(layoutPreset);
+
+    try {
+      final result1 = await pagSeguro.setStyleData(
+        headTextColor: style?.headTextColor,
+        headBackgroundColor: style?.headBackgroundColor,
+        contentTextColor: style?.contentTextColor,
+        contentTextValue1Color: style?.contentTextValue1Color,
+        contentTextValue2Color: style?.contentTextValue2Color,
+        positiveButtonTextColor: style?.positiveButtonTextColor,
+        positiveButtonBackground: style?.positiveButtonBackground,
+        negativeButtonTextColor: style?.negativeButtonTextColor,
+        negativeButtonBackground: style?.negativeButtonBackground,
+        genericButtonBackground: style?.genericButtonBackground,
+        genericButtonTextColor: style?.genericButtonTextColor,
+        genericSmsEditTextBackground: style?.genericSmsEditTextBackground,
+        genericSmsEditTextTextColor: style?.genericSmsEditTextTextColor,
+        lineColor: style?.lineColor,
+      );
+      message = result1['message']!;
+      actualPreset = layoutPreset;
+      displayMessage = message;
+      BotToast.showText(text: message);
+
+      final bool success = result1['success'] ?? false;
+      if (success) {
+        final result2 = await pagSeguro.setPlugPagCustomPrinterLayout(
+          title: title,
+          titleColor: style?.headTextColor,
+          confirmTextColor: style?.positiveButtonTextColor,
+          cancelTextColor: style?.negativeButtonTextColor,
+          windowBackgroundColor: style?.headBackgroundColor,
+          buttonBackgroundColor: style?.positiveButtonBackground,
+          buttonBackgroundColorDisabled: style?.negativeButtonBackground,
+          sendSMSTextColor: style?.genericSmsEditTextTextColor,
+          maxTimeShowPopup: maxTimeShowPopup,
+        );
+        message = result2['message']!;
+        displayMessage = message;
+        BotToast.showText(text: message);
+      }
+    } catch (e) {
+      actualPreset = null;
+      message = 'Erro ao Definir Estilo Completo!';
+      displayMessage = '$message\n$e';
+    } finally {
+      isLoading = false;
+      isStyleTapped = false;
       notifyListeners();
     }
   }

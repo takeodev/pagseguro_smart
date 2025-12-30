@@ -17,6 +17,8 @@ class CommandsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final PaymentProvider payProv = context.watch<PaymentProvider>();
+    final int receiptTimeout = 15;
+    final String receiptTitle = 'Recibo PagSeguro Smart';
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(10),
@@ -29,7 +31,7 @@ class CommandsTab extends StatelessWidget {
               child: Column(
                 children: [
                   const Text(
-                    'Configurações de Layouts',
+                    'Configurações de Cores / Layouts',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   const Divider(),
@@ -41,57 +43,66 @@ class CommandsTab extends StatelessWidget {
                         icon: const Icon(Icons.color_lens_rounded),
                         onPressed:
                             payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.blackPink
-                            ? () => payProv.setStyleData(LayoutPreset.blackPink)
+                                payProv.actualPreset != LayoutPreset.pagSeguro
+                            ? () => payProv.setFullStyleData(
+                                title: receiptTitle,
+                                layoutPreset: LayoutPreset.pagSeguro,
+                                maxTimeShowPopup: receiptTimeout,
+                              )
                             : null,
-                        label: const Text('Tema Pink'),
+                        label: const Text('PagSeguro'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.colorize),
                         onPressed:
                             payProv.isActivated &&
                                 payProv.actualPreset != LayoutPreset.darkBlue
-                            ? () => payProv.setStyleData(LayoutPreset.darkBlue)
+                            ? () => payProv.setFullStyleData(
+                                title: receiptTitle,
+                                layoutPreset: LayoutPreset.darkBlue,
+                                maxTimeShowPopup: receiptTimeout,
+                              )
                             : null,
-                        label: const Text('Tema Azul'),
+                        label: const Text('Azul'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.border_color),
                         onPressed:
                             payProv.isActivated &&
                                 payProv.actualPreset != LayoutPreset.darkGreen
-                            ? () => payProv.setStyleData(LayoutPreset.darkGreen)
+                            ? () => payProv.setFullStyleData(
+                                title: receiptTitle,
+                                layoutPreset: LayoutPreset.darkGreen,
+                                maxTimeShowPopup: receiptTimeout,
+                              )
                             : null,
-                        label: const Text('Tema Verde'),
+                        label: const Text('Verde'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.invert_colors_on),
                         onPressed:
                             payProv.isActivated &&
                                 payProv.actualPreset != LayoutPreset.warmSunset
-                            ? () =>
-                                  payProv.setStyleData(LayoutPreset.warmSunset)
+                            ? () => payProv.setFullStyleData(
+                                title: receiptTitle,
+                                layoutPreset: LayoutPreset.warmSunset,
+                                maxTimeShowPopup: receiptTimeout,
+                              )
                             : null,
-                        label: const Text('Tema Fogo'),
-                      ),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.format_color_text),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.warmLight
-                            ? () => payProv.setStyleData(LayoutPreset.warmLight)
-                            : null,
-                        label: const Text('Tema Suave'),
+                        label: const Text('Por do Sol'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.format_color_fill),
                         onPressed:
                             payProv.isActivated &&
                                 payProv.actualPreset != LayoutPreset.lightCustom
-                            ? () =>
-                                  payProv.setStyleData(LayoutPreset.lightCustom)
+                            ? () => payProv.setFullStyleData(
+                                title: receiptTitle,
+                                layoutPreset: LayoutPreset.lightCustom,
+                                maxTimeShowPopup: receiptTimeout,
+                              )
                             : null,
-                        label: const Text('Tema Leve'),
+                        label: const Text('Suave / Leve'),
                       ),
                     ],
                   ),

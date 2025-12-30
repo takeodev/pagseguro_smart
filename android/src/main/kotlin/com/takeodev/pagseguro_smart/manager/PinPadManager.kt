@@ -413,20 +413,20 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona **/
     fun setStyleData(call: MethodCall, result: MethodChannel.Result) {
         val styleData = PlugPagStyleData(
-            headTextColor = Util.callColorInt(call, "headTextColor", 0xFF000000.toInt()),
-            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor", 0xFFE13C70.toInt()),
-            contentTextColor = Util.callColorInt(call, "contentTextColor", 0xFFDFDFE0.toInt()),
-            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color", 0xFFFFE000.toInt()),
-            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color", 0xFF000000.toInt()),
-            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor", 0xFFFFFFFF.toInt()),
-            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground", 0xFFFF358C.toInt()),
-            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor", 0xFF777778.toInt()),
-            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground", 0xFF000000.toInt()),
-            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground", 0xFF000000.toInt()),
-            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor", 0xFFFF358C.toInt()),
-            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground", 0xFF000000.toInt()),
-            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor", 0xFFFF358C.toInt()),
-            lineColor = Util.callColorInt(call, "lineColor", 0xFF000000.toInt())
+            headTextColor = Util.callColorInt(call, "headTextColor"),
+            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor"),
+            contentTextColor = Util.callColorInt(call, "contentTextColor"),
+            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color"),
+            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color"),
+            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor"),
+            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground"),
+            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor"),
+            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground"),
+            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground"),
+            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor"),
+            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground"),
+            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor"),
+            lineColor = Util.callColorInt(call, "lineColor")
         )
 
         CoroutineHelper.launchIO(scope) {
@@ -470,20 +470,20 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Assíncrona **/
     fun asyncSetStyles(call: MethodCall, result: MethodChannel.Result) {
         val styleData = PlugPagStyleData(
-            headTextColor = Util.callColorInt(call, "headTextColor", 0xFF000000.toInt()),
-            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor", 0xFFE13C70.toInt()),
-            contentTextColor = Util.callColorInt(call, "contentTextColor", 0xFFDFDFE0.toInt()),
-            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color", 0xFFFFE000.toInt()),
-            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color", 0xFF000000.toInt()),
-            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor", 0xFFFFFFFF.toInt()),
-            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground", 0xFFFF358C.toInt()),
-            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor", 0xFF777778.toInt()),
-            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground", 0xFF000000.toInt()),
-            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground", 0xFF000000.toInt()),
-            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor", 0xFFFF358C.toInt()),
-            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground", 0xFF000000.toInt()),
-            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor", 0xFFFF358C.toInt()),
-            lineColor = Util.callColorInt(call, "lineColor", 0xFF000000.toInt())
+            headTextColor = Util.callColorInt(call, "headTextColor"),
+            headBackgroundColor = Util.callColorInt(call, "headBackgroundColor"),
+            contentTextColor = Util.callColorInt(call, "contentTextColor"),
+            contentTextValue1Color = Util.callColorInt(call, "contentTextValue1Color"),
+            contentTextValue2Color = Util.callColorInt(call, "contentTextValue2Color"),
+            positiveButtonTextColor = Util.callColorInt(call, "positiveButtonTextColor"),
+            positiveButtonBackground = Util.callColorInt(call, "positiveButtonBackground"),
+            negativeButtonTextColor = Util.callColorInt(call, "negativeButtonTextColor"),
+            negativeButtonBackground = Util.callColorInt(call, "negativeButtonBackground"),
+            genericButtonBackground = Util.callColorInt(call, "genericButtonBackground"),
+            genericButtonTextColor = Util.callColorInt(call, "genericButtonTextColor"),
+            genericSmsEditTextBackground = Util.callColorInt(call, "genericSmsEditTextBackground"),
+            genericSmsEditTextTextColor = Util.callColorInt(call, "genericSmsEditTextTextColor"),
+            lineColor = Util.callColorInt(call, "lineColor")
         )
 
         CoroutineHelper.launchIO(scope) {

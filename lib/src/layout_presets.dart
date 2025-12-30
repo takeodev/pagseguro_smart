@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pagseguro_smart/src/models/styledata_model.dart';
 
 enum LayoutPreset {
-  blackPink,
+  pagSeguro,
   darkBlue,
   darkGreen,
   lightCustom,
@@ -12,23 +12,22 @@ enum LayoutPreset {
 
 class LayoutPresets {
   static final Map<LayoutPreset, StyleDataModel> _presets = {
-    /// Padrão de Exemplo PagSeguro Wrapper
-    // https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/-wrapper-p-p-s/br.com.uol.pagseguro.plugpagservice.wrapper/-plug-pag/set-style-data.html
-    LayoutPreset.blackPink: const StyleDataModel(
-      headTextColor: Color(0xFF000000),
-      headBackgroundColor: Color(0xFFE13C70),
-      contentTextColor: Color(0xFFDFDFE0),
-      contentTextValue1Color: Color(0xFFFFE000),
-      contentTextValue2Color: Color(0xFF000000),
+    /// PagSeguro
+    LayoutPreset.pagSeguro: const StyleDataModel(
+      headTextColor: Color(0xFFFFFFFF),
+      headBackgroundColor: Color(0xFF323232),
+      contentTextColor: Color(0xFFE0E0E0),
+      contentTextValue1Color: Color(0xFF53D331),
+      contentTextValue2Color: Color(0xFFAAAAAA),
       positiveButtonTextColor: Color(0xFF000000),
-      positiveButtonBackground: Color(0xFFFF358C),
-      negativeButtonTextColor: Color(0xFF777778),
-      negativeButtonBackground: Color(0xFF000000),
-      genericButtonBackground: Color(0xFF000000),
-      genericButtonTextColor: Color(0xFFFF358C),
-      genericSmsEditTextBackground: Color(0xFF000000),
-      genericSmsEditTextTextColor: Color(0xFFFF358C),
-      lineColor: Color(0xFF000000),
+      positiveButtonBackground: Color(0xFF53D331),
+      negativeButtonTextColor: Color(0xFFFFFFFF),
+      negativeButtonBackground: Color(0xFF424242),
+      genericButtonBackground: Color(0xFF323232),
+      genericButtonTextColor: Color(0xFF53D331),
+      genericSmsEditTextBackground: Color(0xFF2B2B2B),
+      genericSmsEditTextTextColor: Color(0xFFFFFFFF),
+      lineColor: Color(0xFF333333),
     ),
 
     /// 🔵 Dark Blue
@@ -122,7 +121,8 @@ class LayoutPresets {
     ),
   };
 
-  static StyleDataModel of(LayoutPreset preset) {
+  static StyleDataModel? of(LayoutPreset? preset) {
+    if (preset == null) return null;
     return _presets[preset] ??
         (throw ArgumentError('LayoutPreset Inexistente: $preset'));
   }

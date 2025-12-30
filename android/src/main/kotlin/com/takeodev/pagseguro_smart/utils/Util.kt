@@ -16,86 +16,49 @@ import io.flutter.plugin.common.MethodCall
 object Util {
     /**
      * Recupera um argumento do tipo String a partir do MethodCall.
-     *
-     * @param call MethodCall recebido do Flutter
-     * @param key Nome da chave do argumento
-     * @param defaultValue Valor padrão caso a chave não exista ou seja nula
-     * @return String válida
      */
-    fun callString(call: MethodCall, key: String, defaultValue: String): String {
-        return call.argument<String>(key) ?: defaultValue
+    fun callString(call: MethodCall, key: String): String? {
+        return call.argument<String>(key)
     }
 
     /**
      * Recupera um argumento numérico do MethodCall como Int.
-     *
-     * @param call MethodCall recebido do Flutter
-     * @param key Nome da chave do argumento
-     * @param defaultValue Valor padrão caso a chave não exista ou seja nula
-     * @return Int válido
      */
-    fun callInt(call: MethodCall, key: String, defaultValue: Int): Int {
-        return call.argument<Number>(key)?.toInt() ?: defaultValue
+    fun callInt(call: MethodCall, key: String, default: Int): Int {
+        return call.argument<Number>(key)?.toInt() ?: default
     }
 
     /**
      * Recupera um argumento de cor vindo do Flutter e converte para
      * um HEX válido aceito pelo Android (`#AARRGGBB`).
-     *
-     * Aceita:
-     * - Int (ex: Color.value do Flutter)
-     * - Long
-     * - String no formato `#RRGGBB` ou `#AARRGGBB`
-     *
-     * Caso o valor seja inválido, retorna o default informado.
-     *
-     * @param call MethodCall recebido do Flutter
-     * @param key Nome da chave do argumento
-     * @param defaultValue Cor padrão no formato HEX (`#AARRGGBB`)
-     * @return String HEX válida e opaca
+     * Retorna null se o argumento não existir ou for inválido.
      */
-    fun callHex(call: MethodCall, key: String, defaultValue: String): String {
-        val value = call.argument<Any>(key)
+    fun callHex(call: MethodCall, key: String): String? {
+        val value = call.argument<Any>(key) ?: return null
 
         return when (value) {
             is Int -> String.format("#%08X", value)
             is Long -> String.format("#%08X", value.toInt())
             is String -> {
                 val hex = value.uppercase()
-                if (hex.startsWith("#") && (hex.length == 7 || hex.length == 9)) {
-                    forceOpaque(hex)
+                // Aceita formatos com # ou sem prefixo, com 6 ou 8 caracteres hex
+                if (hex.startsWith("#")) {
+                    if (hex.length == 7 || hex.length == 9) forceOpaque(hex) else null
                 } else {
-                    defaultValue
+                    // Caso venha sem o #, tenta tratar
+                    if (hex.length == 6 || hex.length == 8) forceOpaque("#$hex") else null
                 }
             }
-            else -> defaultValue
+            else -> null
         }
     }
 
     /**
      * Recupera um valor de cor a partir de um [MethodCall] do Flutter
-     * e converte de forma segura para um [Int] no formato ARGB.
-     *
-     * Este método deve ser utilizado em APIs do PlugPag que exigem cores
-     * como valores inteiros, como o [PlugPagStyleData].
-     *
-     * Formatos de entrada suportados vindos do Flutter:
-     * - [Int]    → Utilizado diretamente (recomendado ao passar Color.value)
-     * - [Long]   → Convertido para [Int]
-     * - [String] → Interpretado como cor HEX (#RRGGBB ou #AARRGGBB)
-     *
-     * Caso o valor informado seja inválido, inexistente ou não possa ser
-     * convertido corretamente, o [defaultValue] será retornado para evitar
-     * falhas em tempo de execução.
-     *
-     * @param call MethodCall recebido do Flutter
-     * @param key Nome da chave do argumento
-     * @param defaultValue Cor ARGB padrão utilizada como fallback
-     *
-     * @return Cor válida no formato ARGB como [Int]
+     * e converte para [Int] ARGB. Retorna null se falhar.
      */
-    fun callColorInt(call: MethodCall, key: String, defaultValue: Int): Int {
-        val value = call.argument<Any>(key)
+    fun callColorInt(call: MethodCall, key: String): Int? {
+        val value = call.argument<Any>(key) ?: return null
 
         return when (value) {
             is Int -> value
@@ -103,29 +66,22 @@ object Util {
             is String -> {
                 try {
                     android.graphics.Color.parseColor(forceOpaque(value))
-                } catch (e: IllegalArgumentException) {
-                    defaultValue
+                } catch (e: Exception) {
+                    null
                 }
             }
-            else -> defaultValue
+            else -> null
         }
     }
 
-
     /**
      * Garante que uma cor HEX esteja no formato opaco.
-     *
-     * Se receber `#RRGGBB`, converte para `#FFRRGGBB`.
-     * Se já estiver em `#AARRGGBB`, retorna sem alteração.
-     *
-     * @param hex String HEX de cor
-     * @return String HEX com alpha forçado para `FF`
      */
     fun forceOpaque(hex: String): String {
-        return if (hex.length == 7) {
-            "#FF" + hex.substring(1)
-        } else {
-            hex
+        return when (hex.length) {
+            7 -> "#FF" + hex.substring(1) // #RRGGBB -> #FFRRGGBB
+            9 -> hex                      // #AARRGGBB -> mantém
+            else -> hex
         }
     }
 }

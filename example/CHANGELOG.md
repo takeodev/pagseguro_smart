@@ -1,5 +1,10 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.10
+
+- [Add] Utilização de Layout "_pagSeguro_".
+- [Add] Em "**PaymentProvider**" nova função "_setFullStyleData_" unindo ambas pré-existentes "_setStyleData_" e "_setPlugPagCustomPrinterLayout_".
+
 ## 1.0.9
 
 - [Add] Segurança contra Método de Pagamento "_tMoney_".
