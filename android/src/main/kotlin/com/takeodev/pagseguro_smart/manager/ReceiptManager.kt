@@ -40,6 +40,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Reimpressão de Recibo: Via do Cliente de forma Síncrona **/
     fun reprintCustomerReceipt(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (reprintCustomerReceipt)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val printResult = plugPag.reprintCustomerReceipt()
@@ -86,6 +88,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Reimpressão de Recibo: Via do Cliente de forma Assíncrona **/
     fun asyncReprintCustomerReceipt(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncReprintCustomerReceipt)", plugPag.hashCode().toString())
+
         try {
             plugPag.asyncReprintCustomerReceipt(object : PlugPagPrinterListener {
                 override fun onSuccess(printResult: PlugPagPrintResult) {
@@ -131,6 +135,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Reimpressão de Recibo: Via da Loja de forma Síncrona **/
     fun reprintEstablishmentReceipt(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (reprintEstablishmentReceipt)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val printResult = plugPag.reprintStablishmentReceipt()
@@ -178,6 +184,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Reimpressão de Recibo: Via da Loja de forma Assíncrona **/
     fun asyncReprintEstablishmentReceipt(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncReprintEstablishmentReceipt)", plugPag.hashCode().toString())
+
         try {
             plugPag.asyncReprintEstablishmentReceipt(object : PlugPagPrinterListener {
                 override fun onSuccess(printResult: PlugPagPrintResult) {
@@ -293,6 +301,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Configura Ações de Impressão de Recibo **/
     fun setPrintActionListener(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (setPrintActionListener)", plugPag.hashCode().toString())
+
         val askReceipt = call.argument<Boolean>("askReceipt") ?: false
         val smsReceipt = call.argument<Boolean>("smsReceipt") ?: false
         val directReceipt = call.argument<Boolean>("directReceipt") ?: false
@@ -374,6 +384,8 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona **/
     fun setPlugPagCustomPrinterLayout(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (setPlugPagCustomPrinterLayout)", plugPag.hashCode().toString())
+
         val layout = PlugPagCustomPrinterLayout(
             title = Util.callString(call, "title"),
             titleColor = Util.callHex(call, "titleColor"),

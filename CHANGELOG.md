@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.6
+
+- [Add] Log de Controle de Instância do "**plugPag**" do Wrapper da PagSeguro.
+
 ## 1.2.5
 
 - [Add] Em "**setPlugPagCustomPrinterLayout**" adicionado parâmetro para Impressão Direta do Recibo de Cliente (sem perguntar).

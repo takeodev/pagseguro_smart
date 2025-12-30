@@ -44,6 +44,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Executa o Pagamento de forma Síncrona **/
     fun doPayment(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (doPayment)", plugPag.hashCode().toString())
+
         abortRequested = false
 
         val amount = call.argument<Double>("amount") ?: 0.0
@@ -163,6 +165,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Executa o Pagamento de forma Assíncrona **/
     fun doAsyncPayment(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (doAsyncPayment)", plugPag.hashCode().toString())
+
         try {
             abortRequested = false
 
@@ -303,6 +307,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Solicita o Cancelamento de Transação de forma Síncrona **/
     fun abortTransaction(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (abortTransaction)", plugPag.hashCode().toString())
+
         abortRequested = true
 
         CoroutineHelper.launchIO(scope) {
@@ -351,6 +357,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Solicita o Cancelamento de Transação de forma Assíncrona **/
     fun asyncAbortTransaction(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncAbortTransaction)", plugPag.hashCode().toString())
+
         try {
             abortRequested = true
             plugPag.asyncAbort(object : PlugPagAbortListener {
@@ -405,6 +413,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Estorna Pagamento de forma Síncrona **/
     fun voidPayment(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (voidPayment)", plugPag.hashCode().toString())
+
         abortRequested = false
 
         val transactionCode = call.argument<String>("transactionCode") ?: ""
@@ -513,6 +523,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Estorna Pagamento de forma Assíncrona **/
     fun asyncVoidPayment(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncVoidPayment)", plugPag.hashCode().toString())
+
         try {
             abortRequested = false
 
@@ -640,6 +652,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Busca a Última Transação Aprovada de forma Síncrona **/
     fun getLastTransaction(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (getLastTransaction)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val transactionResult = plugPag.getLastApprovedTransaction()
@@ -683,6 +697,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Busca a Última Transação Aprovada de forma Assíncrona **/
     fun asyncGetLastTransaction(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncGetLastTransaction)", plugPag.hashCode().toString())
+
         try {
             plugPag.asyncGetLastApprovedTransaction(object : PlugPagLastTransactionListener {
                 override fun onRequestedLastTransaction(transactionResult: PlugPagTransactionResult) {

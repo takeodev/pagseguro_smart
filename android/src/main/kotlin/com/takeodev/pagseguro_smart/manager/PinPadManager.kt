@@ -37,6 +37,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Verifica se PinPad foi Autenticado de forma Assíncrona **/
     fun isAuthenticated(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (isAuthenticated)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val isAuth = plugPag.isAuthenticated()
@@ -79,6 +81,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Verifica se PinPad foi Autenticado de forma Assíncrona **/
     fun asyncIsAuthenticated(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncIsAuthenticated)", plugPag.hashCode().toString())
+
         try {
             plugPag.asyncIsAuthenticated(
                 object : PlugPagIsActivatedListener {
@@ -131,6 +135,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Inicializa e ativa o PinPad de forma Síncrona **/
     fun initPinPad(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (initPinPad)", plugPag.hashCode().toString())
+
         // Validação
         val code = call.argument<String>("activationCode").orEmpty()
         if (code.isEmpty()) {
@@ -190,6 +196,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Inicializa e ativa o PinPad de forma Assíncrona **/
     fun asyncInitPinPad(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncInitPinPad)", plugPag.hashCode().toString())
+
         try {
             // Validação
             val code = call.argument<String>("activationCode").orEmpty()
@@ -255,6 +263,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Coleta Dados do Usuário (Dono da Maquininha) **/
     fun getUserData(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (getUserData)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) { // roda em thread de background
             try {
                 val userData: PlugPagUserDataResult? = try {
@@ -302,6 +312,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Busca o Número de Série da Maquininha **/
     fun getSerialNumber(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (getSerialNumber)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val serialNumber: String? = try {
@@ -349,6 +361,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Reinicia a Maquininha **/
     fun rebootDevice(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (rebootDevice)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 plugPag.reboot()
@@ -380,6 +394,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Verifica se o Serviço da PagSeguro está Livre **/
     fun isServiceBusy(result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (isServiceBusy)", plugPag.hashCode().toString())
+
         CoroutineHelper.launchIO(scope) {
             try {
                 val isBusy = plugPag.isServiceBusy()
@@ -412,6 +428,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona **/
     fun setStyleData(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (setStyleData)", plugPag.hashCode().toString())
+
         val styleData = PlugPagStyleData(
             headTextColor = Util.callColorInt(call, "headTextColor"),
             headBackgroundColor = Util.callColorInt(call, "headBackgroundColor"),
@@ -469,6 +487,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
 
     /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Assíncrona **/
     fun asyncSetStyles(call: MethodCall, result: MethodChannel.Result) {
+        logger.info("PlugPag Instance (asyncSetStyles)", plugPag.hashCode().toString())
+
         val styleData = PlugPagStyleData(
             headTextColor = Util.callColorInt(call, "headTextColor"),
             headBackgroundColor = Util.callColorInt(call, "headBackgroundColor"),
