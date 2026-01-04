@@ -38,6 +38,11 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     private val logger = Logger(TAG)
 
+    /** Variáveis para Impressão de Recibo do Cliente **/
+    private var askReceipt: Boolean = false
+    private var smsReceipt: Boolean = false
+    private var directReceipt: Boolean = false
+
     /** Reimpressão de Recibo: Via do Cliente de forma Síncrona **/
     fun reprintCustomerReceipt(result: MethodChannel.Result) {
         logger.info("PlugPag Instance (reprintCustomerReceipt)", plugPag.hashCode().toString())
@@ -303,51 +308,59 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
     fun setPrintActionListener(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (setPrintActionListener)", plugPag.hashCode().toString())
 
-        val askReceipt = call.argument<Boolean>("askReceipt") ?: false
-        val smsReceipt = call.argument<Boolean>("smsReceipt") ?: false
-        val directReceipt = call.argument<Boolean>("directReceipt") ?: false
+        this.askReceipt = call.argument<Boolean>("askReceipt") ?: false
+        this.smsReceipt = call.argument<Boolean>("smsReceipt") ?: false
+        this.directReceipt = call.argument<Boolean>("directReceipt") ?: false
+
+        val listener = object : PlugPagPrintActionListener {
+            override fun onPrint(
+                phoneNumber: String?,
+                transactionResult: PlugPagTransactionResult?,
+                onFinishActions: PlugPagPrintActionListener.OnFinishPlugPagPrintActions?
+            ) {
+                val transactionId = transactionResult?.transactionId
+                logger.info("setPrintActionListener (onPrint)", "Interceptando Impressão de Recibo | Id: $transactionId")
+                logger.info("setPrintActionListener (onPrint)", "askReceipt: ${this@ReceiptManager.askReceipt} | smsReceipt: ${this@ReceiptManager.smsReceipt} | directReceipt: ${this@ReceiptManager.directReceipt}")
+
+                when {
+                    this@ReceiptManager.askReceipt -> {
+                        logger.info("setPrintActionListener (showPopup)", "Diálogo para Impressão de Recibo.")
+                        // Exibe a tela de diálogo de envio ou impressão de comprovante fornecida pela PlugPagService.
+                        onFinishActions?.showPopup(plugPag)
+                    }
+                    this@ReceiptManager.smsReceipt -> {
+                        logger.info("setPrintActionListener (sendSMS)", "Envio de Recibo via SMS.")
+                        if (!phoneNumber.isNullOrBlank()) {
+                            // Realiza o envio do comprovante de transação (via do cliente) por SMS.
+                            onFinishActions?.sendSMS(plugPag, phoneNumber)
+                        } else {
+                            logger.warn("setPrintActionListener (phoneNumber.isNullOrBlank)", "Número de Telefone Inválido para SMS!")
+                            // Exibe a tela de diálogo de envio ou impressão de comprovante fornecida pela PlugPagService.
+                            onFinishActions?.showPopup(plugPag)
+                        }
+                    }
+                    this@ReceiptManager.directReceipt -> {
+                        logger.info("setPrintActionListener (doPrint)", "Impressão Direta (Sem Perguntar).")
+                        // Realiza a impressão do comprovante de transação (via do cliente).
+                        onFinishActions?.doPrint(plugPag)
+                    }
+                    else -> {
+                        logger.info("setPrintActionListener (doNothing)", "Dispensa Impressão de Recibo.")
+                        // Dispensa o envio e a impressão do comprovante (via do cliente).
+                        onFinishActions?.doNothing(plugPag)
+                    }
+                }
+            }
+
+            override fun onError(exception: PlugPagException?) {
+                logger.error("setPrintActionListener (onError)", "Erro na Intercepção de Impressão de Recibo: ${exception?.message}")
+            }
+        }
 
         CoroutineHelper.launchIO(scope) {
             try {
-                val listener = object : PlugPagPrintActionListener {
-                    override fun onPrint(
-                        phoneNumber: String?,
-                        transactionResult: PlugPagTransactionResult?,
-                        onFinishActions: PlugPagPrintActionListener.OnFinishPlugPagPrintActions?
-                    ) {
-                        CoroutineHelper.launchMain(scope) {
-                            val transactionId = transactionResult?.transactionId
-                            logger.info("setPrintActionListener (onPrint)", "Interceptando Impressão de Recibo | Id: $transactionId")
-                            logger.info("setPrintActionListener (onPrint)", "askReceipt: $askReceipt | smsReceipt: $smsReceipt | directReceipt: $directReceipt")
-
-                            if (askReceipt) {
-                                // Exibe a tela de diálogo de envio ou impressão de comprovante (via do cliente).
-                                onFinishActions?.showPopup(plugPag)
-                            } else if (smsReceipt) {
-                                // Realiza o envio do comprovante de transação (via do cliente) por SMS.
-                                if (!phoneNumber.isNullOrBlank()) {
-                                    onFinishActions?.sendSMS(plugPag, phoneNumber)
-                                } else {
-                                    logger.warn("setPrintActionListener (phoneNumber.isNullOrBlank)", "Número de Telefone Inválido para SMS!")
-                                    onFinishActions?.showPopup(plugPag)
-                                }
-                            } else if (directReceipt) {
-                                // Realiza a impressão do comprovante de transação (via do cliente).
-                                onFinishActions?.doPrint(plugPag)
-                            } else {
-                                onFinishActions?.doNothing(plugPag)
-                            }
-                        }
-                    }
-
-                    override fun onError(exception: PlugPagException?) {
-                        CoroutineHelper.launchMain(scope) {
-                            logger.error("setPrintActionListener (onError)", "Erro na Intercepção de Impressão de Recibo: ${exception?.message}")
-                        }
-                    }
-                }
-
                 val actionResult: PlugPagPrintActionResult = plugPag.setPrintActionListener(listener)
+
                 CoroutineHelper.launchMain(scope) {
                     if (actionResult.result == PlugPag.RET_OK) {
                         logger.info("setPrintActionListener", "Configurada Impressão de Recibo!")
