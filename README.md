@@ -67,7 +67,7 @@ No `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pagseguro_smart: ^1.0.5+5
+  pagseguro_smart: ^1.2.8
 ```
 
 Execute:

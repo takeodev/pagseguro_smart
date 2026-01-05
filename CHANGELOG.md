@@ -1,5 +1,11 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.8
+
+- [Improve] Em "**setPrintActionListener**".
+- [Add] Em "**reapplyPrintActionListener**" em "**doPayment**".
+- [Improve] Atualizado README.
+
 ## 1.2.7
 
 - [Improve] Em "**setPrintActionListener**".

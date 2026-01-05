@@ -33,6 +33,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
         private const val TAG = "PinPadManager"
     }
 
+    /** Logger personalizado com TAG para identificar a Origem **/
     private val logger = Logger(TAG)
 
     /** Verifica se PinPad foi Autenticado de forma Assíncrona **/

@@ -52,8 +52,8 @@ class PlugPagServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
 
         // Inicializa gerenciadores
         pinPadManager = PinPadManager(plugPag, pluginScope)
-        paymentManager = PaymentManager(plugPag, pluginScope)
         receiptManager = ReceiptManager(plugPag, pluginScope)
+        paymentManager = PaymentManager(plugPag, pluginScope, receiptManager)
 
         // Define canal global
         PaymentManager.plugPagChannel = channel

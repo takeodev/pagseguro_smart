@@ -23,11 +23,12 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagVoidData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventListener
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
+import com.takeodev.pagseguro_smart.manager.ReceiptManager
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 /** Gerencia todas as operações de pagamento **/
-class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineScope) {
+class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineScope, private val receiptManager: ReceiptManager) {
 
     companion object {
         /** Tag utilizada nos logs */
@@ -37,6 +38,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
         var plugPagChannel: MethodChannel? = null
     }
 
+    /** Logger personalizado com TAG para identificar a Origem **/
     private val logger = Logger(TAG)
 
     /** Variável para indicar se o cancelamento foi solicitado **/
@@ -44,6 +46,7 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
 
     /** Executa o Pagamento de forma Síncrona **/
     fun doPayment(call: MethodCall, result: MethodChannel.Result) {
+
         logger.info("PlugPag Instance (doPayment)", plugPag.hashCode().toString())
 
         abortRequested = false
@@ -94,6 +97,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
             ))
             return
         }
+
+        receiptManager.reapplyPrintActionListener()
 
         val paymentData = PlugPagPaymentData(
             type = type,
@@ -216,6 +221,8 @@ class PaymentManager(private val plugPag: PlugPag, private val scope: CoroutineS
                 ))
                 return
             }
+
+            receiptManager.reapplyPrintActionListener()
 
             val paymentData = PlugPagPaymentData(
                 type = type,
