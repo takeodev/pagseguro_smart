@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.12
+
+- [Upgrade] Wrapper da PagSeguro "~~_1.30.52_~~" => "_1.33.0_".
+
 ## 1.0.11
 
 - [Add] Opção de Impressão de Recibo do Cliente de forma direta, sem perguntar.

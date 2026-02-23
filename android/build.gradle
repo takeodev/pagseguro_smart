@@ -67,9 +67,10 @@ android {
     }
 }
 
-
 dependencies{
-    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.30.52'
+    // https://github.com/pagseguro/pagseguro-sdk-plugpagservicewrapper/tree/master/br/com/uol/pagseguro/plugpagservice/wrapper/wrapper
+    // https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/index.html
+    implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.33.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2"
     implementation 'com.google.dagger:dagger:2.38.1'
     annotationProcessor "com.google.dagger:dagger-compiler:2.38.1"

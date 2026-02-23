@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.2.9
+
+- [Upgrade] Wrapper da PagSeguro "~~_1.30.52_~~" => "_1.33.0_".
+
 ## 1.2.8
 
 - [Improve] Em "**setPrintActionListener**".
