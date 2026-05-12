@@ -27,9 +27,7 @@ class PagSeguroService {
   /// Recebe callbacks nativos e redireciona para os eventos apropriados
   Future<void> _handleNativeCallbacks(MethodCall call) async {
     final rawArgs = call.arguments;
-    final data = (rawArgs is Map)
-        ? Map<String, dynamic>.from(rawArgs)
-        : <String, dynamic>{};
+    final data = (rawArgs is Map) ? Map<String, dynamic>.from(rawArgs) : <String, dynamic>{};
 
     switch (call.method) {
       case 'onPaymentProgress':
@@ -46,13 +44,11 @@ class PagSeguroService {
     final lower = message.toLowerCase();
 
     if (lower.contains('processando')) return _canAbort;
-    if (_contains(lower, Constants.allowWords) ||
-        _contains(lower, Constants.allowPhrases)) {
+    if (_contains(lower, Constants.allowWords) || _contains(lower, Constants.allowPhrases)) {
       return _setAbort(true);
     }
 
-    if (_contains(lower, Constants.denyWords) ||
-        _contains(lower, Constants.denyPhrases)) {
+    if (_contains(lower, Constants.denyWords) || _contains(lower, Constants.denyPhrases)) {
       return _setAbort(false);
     }
 
@@ -80,11 +76,7 @@ class PagSeguroService {
       final result = await _methodChannel.invokeMethod(method, arguments);
       final map = result is Map ? Map<String, dynamic>.from(result) : {};
 
-      return {
-        'success': map['success'] ?? false,
-        'message': map['message'] ?? '',
-        'data': map['data']
-      };
+      return {'success': map['success'] ?? false, 'message': map['message'] ?? '', 'data': map['data']};
     } on PlatformException catch (e) {
       return {'success': false, 'message': e.message ?? e.code, 'data': null};
     } catch (e) {
@@ -93,14 +85,11 @@ class PagSeguroService {
   }
 
   /// Verifica se PinPad está Ativo
-  Future<Map<String, dynamic>> isAuthenticated() =>
-      _invokeNative('isAuthenticated');
-  Future<Map<String, dynamic>> asyncIsAuthenticated() =>
-      _invokeNative('asyncIsAuthenticated');
+  Future<Map<String, dynamic>> isAuthenticated() => _invokeNative('isAuthenticated');
+  Future<Map<String, dynamic>> asyncIsAuthenticated() => _invokeNative('asyncIsAuthenticated');
 
   /// Inicializa o PinPad
-  Future<Map<String, dynamic>> initPinPad(String activationCode) =>
-      _invokeNative('initPinPad', {'activationCode': activationCode});
+  Future<Map<String, dynamic>> initPinPad(String activationCode) => _invokeNative('initPinPad', {'activationCode': activationCode});
   Future<Map<String, dynamic>> asyncInitPinPad(String activationCode) =>
       _invokeNative('asyncInitPinPad', {'activationCode': activationCode});
 
@@ -136,10 +125,8 @@ class PagSeguroService {
           'negativeButtonBackground': negativeButtonBackground?.toARGB32(),
           'genericButtonBackground': genericButtonBackground?.toARGB32(),
           'genericButtonTextColor': genericButtonTextColor?.toARGB32(),
-          'genericSmsEditTextBackground':
-              genericSmsEditTextBackground?.toARGB32(),
-          'genericSmsEditTextTextColor':
-              genericSmsEditTextTextColor?.toARGB32(),
+          'genericSmsEditTextBackground': genericSmsEditTextBackground?.toARGB32(),
+          'genericSmsEditTextTextColor': genericSmsEditTextTextColor?.toARGB32(),
           'lineColor': lineColor?.toARGB32(),
         },
       );
@@ -157,8 +144,7 @@ class PagSeguroService {
         'type': type.code,
         'amount': value,
         'installmentType': installmentType.code,
-        'installments':
-            installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
+        'installments': installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
         'userReference': userReference,
         'printReceipt': printReceipt,
       });
@@ -174,17 +160,14 @@ class PagSeguroService {
         'type': type.code,
         'amount': value,
         'installmentType': installmentType.code,
-        'installments':
-            installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
+        'installments': installmentType == PagSeguroEnum.iSinglePay ? 1 : installments,
         'userReference': userReference,
         'printReceipt': printReceipt,
       });
 
   /// Aborta / cancela transação em andamento
-  Future<Map<String, dynamic>> abortTransaction() =>
-      _invokeNative('abortTransaction');
-  Future<Map<String, dynamic>> asyncAbortTransaction() =>
-      _invokeNative('asyncAbortTransaction');
+  Future<Map<String, dynamic>> abortTransaction() => _invokeNative('abortTransaction');
+  Future<Map<String, dynamic>> asyncAbortTransaction() => _invokeNative('asyncAbortTransaction');
 
   /// Realiza o estorno
   Future<Map<String, dynamic>> voidPayment({
@@ -213,42 +196,32 @@ class PagSeguroService {
       });
 
   /// Pega os Dados da Última Transação (Pode ser Estorno ou Pagamento)
-  Future<Map<String, dynamic>> getLastTransaction() =>
-      _invokeNative('getLastTransaction');
-  Future<Map<String, dynamic>> asyncGetLastTransaction() =>
-      _invokeNative('asyncGetLastTransaction');
+  Future<Map<String, dynamic>> getLastTransaction() => _invokeNative('getLastTransaction');
+  Future<Map<String, dynamic>> asyncGetLastTransaction() => _invokeNative('asyncGetLastTransaction');
 
   /// Coleta dados do Dono da Maquininha
   Future<Map<String, dynamic>> getUserData() => _invokeNative('getUserData');
 
   /// Coleta Número de Série da Maquininha
-  Future<Map<String, dynamic>> getSerialNumber() =>
-      _invokeNative('getSerialNumber');
+  Future<Map<String, dynamic>> getSerialNumber() => _invokeNative('getSerialNumber');
 
   /// Reinicia a Maquininha
   Future<Map<String, dynamic>> rebootDevice() => _invokeNative('rebootDevice');
 
   /// Verifica se o Serviço da PagSeguro está Livre
-  Future<Map<String, dynamic>> isServiceBusy() =>
-      _invokeNative('isServiceBusy');
+  Future<Map<String, dynamic>> isServiceBusy() => _invokeNative('isServiceBusy');
 
   /// Reimpressão de Recibo: Via do Cliente
-  Future<Map<String, dynamic>> reprintCustomerReceipt() =>
-      _invokeNative('reprintCustomerReceipt');
-  Future<Map<String, dynamic>> asyncReprintCustomerReceipt() =>
-      _invokeNative('asyncReprintCustomerReceipt');
+  Future<Map<String, dynamic>> reprintCustomerReceipt() => _invokeNative('reprintCustomerReceipt');
+  Future<Map<String, dynamic>> asyncReprintCustomerReceipt() => _invokeNative('asyncReprintCustomerReceipt');
 
   /// Reimpressão de Recibo: Via da Loja
-  Future<Map<String, dynamic>> reprintEstablishmentReceipt() =>
-      _invokeNative('reprintEstablishmentReceipt');
-  Future<Map<String, dynamic>> asyncReprintEstablishmentReceipt() =>
-      _invokeNative('asyncReprintEstablishmentReceipt');
+  Future<Map<String, dynamic>> reprintEstablishmentReceipt() => _invokeNative('reprintEstablishmentReceipt');
+  Future<Map<String, dynamic>> asyncReprintEstablishmentReceipt() => _invokeNative('asyncReprintEstablishmentReceipt');
 
   /// Envia Recibo via SMS
-  Future<Map<String, dynamic>> sendReceiptSMS(
-          {required String transactionCode, required String phoneNumber}) =>
-      _invokeNative('sendReceiptSMS',
-          {'phoneNumber': phoneNumber, 'transactionCode': transactionCode});
+  Future<Map<String, dynamic>> sendReceiptSMS({required String transactionCode, required String phoneNumber}) =>
+      _invokeNative('sendReceiptSMS', {'phoneNumber': phoneNumber, 'transactionCode': transactionCode});
 
   /// Configura Ações de Impressão de Recibo
   Future<Map<String, dynamic>> setPrintActionListener({
@@ -283,8 +256,7 @@ class PagSeguroService {
           'cancelTextColor': cancelTextColor?.toARGB32(),
           'windowBackgroundColor': windowBackgroundColor?.toARGB32(),
           'buttonBackgroundColor': buttonBackgroundColor?.toARGB32(),
-          'buttonBackgroundColorDisabled':
-              buttonBackgroundColorDisabled?.toARGB32(),
+          'buttonBackgroundColorDisabled': buttonBackgroundColorDisabled?.toARGB32(),
           'sendSMSTextColor': sendSMSTextColor?.toARGB32(),
           'maxTimeShowPopup': maxTimeShowPopup,
         },

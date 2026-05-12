@@ -28,11 +28,7 @@ class _MainScreenState extends State<MainScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final PaymentProvider payProv = context.read<PaymentProvider>();
       await payProv.isAuthenticated();
-      await payProv.setFullStyleData(
-        title: 'Recibo PagSeguro Smart',
-        layoutPreset: LayoutPreset.darkBlue,
-        maxTimeShowPopup: 15,
-      );
+      await payProv.setFullStyleData(title: 'Recibo PagSeguro Smart', layoutPreset: LayoutPreset.darkBlue, maxTimeShowPopup: 15);
     });
   }
 

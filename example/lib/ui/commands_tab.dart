@@ -30,10 +30,7 @@ class CommandsTab extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text(
-                    'Configurações de Cores / Layouts',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Configurações de Cores / Layouts', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const Divider(),
                   Wrap(
                     spacing: 5,
@@ -41,9 +38,7 @@ class CommandsTab extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         icon: const Icon(Icons.color_lens_rounded),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.pagSeguro
+                        onPressed: payProv.isActivated && payProv.actualPreset != LayoutPreset.pagSeguro
                             ? () => payProv.setFullStyleData(
                                 title: receiptTitle,
                                 layoutPreset: LayoutPreset.pagSeguro,
@@ -54,9 +49,7 @@ class CommandsTab extends StatelessWidget {
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.colorize),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.darkBlue
+                        onPressed: payProv.isActivated && payProv.actualPreset != LayoutPreset.darkBlue
                             ? () => payProv.setFullStyleData(
                                 title: receiptTitle,
                                 layoutPreset: LayoutPreset.darkBlue,
@@ -67,9 +60,7 @@ class CommandsTab extends StatelessWidget {
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.border_color),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.darkGreen
+                        onPressed: payProv.isActivated && payProv.actualPreset != LayoutPreset.darkGreen
                             ? () => payProv.setFullStyleData(
                                 title: receiptTitle,
                                 layoutPreset: LayoutPreset.darkGreen,
@@ -80,9 +71,7 @@ class CommandsTab extends StatelessWidget {
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.invert_colors_on),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.warmSunset
+                        onPressed: payProv.isActivated && payProv.actualPreset != LayoutPreset.warmSunset
                             ? () => payProv.setFullStyleData(
                                 title: receiptTitle,
                                 layoutPreset: LayoutPreset.warmSunset,
@@ -93,9 +82,7 @@ class CommandsTab extends StatelessWidget {
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.format_color_fill),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.actualPreset != LayoutPreset.lightCustom
+                        onPressed: payProv.isActivated && payProv.actualPreset != LayoutPreset.lightCustom
                             ? () => payProv.setFullStyleData(
                                 title: receiptTitle,
                                 layoutPreset: LayoutPreset.lightCustom,
@@ -117,10 +104,7 @@ class CommandsTab extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text(
-                    'Configuração de Recibo do Cliente',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Configuração de Recibo do Cliente', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const Divider(),
                   Wrap(
                     spacing: 5,
@@ -128,41 +112,25 @@ class CommandsTab extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         icon: const Icon(Icons.question_mark_rounded),
-                        onPressed: payProv.isActivated && !payProv.askPrint
-                            ? () => payProv.setPrintActionListener(
-                                askReceipt: true,
-                              )
-                            : null,
+                        onPressed: payProv.isActivated && !payProv.askPrint ? () => payProv.setPrintActionListener(askReceipt: true) : null,
                         label: const Text('Perguntar'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.sms_outlined),
-                        onPressed: payProv.isActivated && !payProv.smsPrint
-                            ? () => payProv.setPrintActionListener(
-                                smsReceipt: true,
-                              )
-                            : null,
+                        onPressed: payProv.isActivated && !payProv.smsPrint ? () => payProv.setPrintActionListener(smsReceipt: true) : null,
                         label: const Text('Via SMS'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.mark_chat_read_rounded),
                         onPressed: payProv.isActivated && !payProv.directPrint
-                            ? () => payProv.setPrintActionListener(
-                                directReceipt: true,
-                              )
+                            ? () => payProv.setPrintActionListener(directReceipt: true)
                             : null,
                         label: const Text('Direto'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.print_disabled),
-                        onPressed:
-                            payProv.isActivated &&
-                                (payProv.askPrint || payProv.smsPrint)
-                            ? () => payProv.setPrintActionListener(
-                                askReceipt: false,
-                                smsReceipt: false,
-                                directReceipt: false,
-                              )
+                        onPressed: payProv.isActivated && (payProv.askPrint || payProv.smsPrint)
+                            ? () => payProv.setPrintActionListener(askReceipt: false, smsReceipt: false, directReceipt: false)
                             : null,
                         label: const Text('Sem Recibo'),
                       ),
@@ -179,10 +147,7 @@ class CommandsTab extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text(
-                    'Transações',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Transações', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const Divider(),
                   Wrap(
                     spacing: 5,
@@ -190,26 +155,17 @@ class CommandsTab extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         icon: const Icon(Icons.receipt_long),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.transactionCode != null
-                            ? () => payProv.reprintReceipt(context)
-                            : null,
+                        onPressed: payProv.isActivated && payProv.transactionCode != null ? () => payProv.reprintReceipt(context) : null,
                         label: const Text('2ª Via Recibo'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.history),
-                        onPressed: payProv.isActivated
-                            ? payProv.getLastTransaction
-                            : null,
+                        onPressed: payProv.isActivated ? payProv.getLastTransaction : null,
                         label: const Text('Última Transação'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.undo),
-                        onPressed:
-                            payProv.isActivated &&
-                                payProv.transactionCode != null &&
-                                payProv.transactionId != null
+                        onPressed: payProv.isActivated && payProv.transactionCode != null && payProv.transactionId != null
                             ? () => payProv.voidPayment(context)
                             : null,
                         label: const Text('Estornar'),
@@ -227,10 +183,7 @@ class CommandsTab extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text(
-                    'Informações',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Informações', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const Divider(),
                   Wrap(
                     spacing: 5,
@@ -238,16 +191,12 @@ class CommandsTab extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         icon: const Icon(Icons.person_pin),
-                        onPressed: payProv.isActivated
-                            ? () => payProv.getUserData(context)
-                            : null,
+                        onPressed: payProv.isActivated ? () => payProv.getUserData(context) : null,
                         label: const Text('Dono da Maquininha'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.qr_code_2),
-                        onPressed: payProv.isActivated
-                            ? () => payProv.getSerialNumber(context)
-                            : null,
+                        onPressed: payProv.isActivated ? () => payProv.getSerialNumber(context) : null,
                         label: const Text('Número de Série'),
                       ),
                     ],
@@ -263,10 +212,7 @@ class CommandsTab extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               child: Column(
                 children: [
-                  const Text(
-                    'Gerenciamento',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
+                  const Text('Gerenciamento', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   const Divider(),
                   Wrap(
                     spacing: 5,
@@ -274,16 +220,12 @@ class CommandsTab extends StatelessWidget {
                     children: [
                       ElevatedButton.icon(
                         icon: const Icon(Icons.remove_red_eye),
-                        onPressed: payProv.isActivated
-                            ? payProv.isServiceBusy
-                            : null,
+                        onPressed: payProv.isActivated ? payProv.isServiceBusy : null,
                         label: const Text('Verificar Serviço'),
                       ),
                       ElevatedButton.icon(
                         icon: const Icon(Icons.restart_alt),
-                        onPressed: !payProv.isInProgress && !payProv.isLoading
-                            ? () => payProv.rebootDevice(context)
-                            : null,
+                        onPressed: !payProv.isInProgress && !payProv.isLoading ? () => payProv.rebootDevice(context) : null,
                         label: const Text('Reiniciar'),
                       ),
                     ],

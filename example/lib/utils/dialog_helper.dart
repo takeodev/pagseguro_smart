@@ -21,9 +21,7 @@ class DialogHelper {
       isScrollControlled: true,
       backgroundColor: Colors.white,
       isDismissible: dismissible,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(22))),
       builder: (context) {
         return Padding(
           padding: MediaQuery.of(context).viewInsets,
@@ -37,26 +35,15 @@ class DialogHelper {
                 children: [
                   // TÍTULO
                   Padding(
-                    padding: const EdgeInsets.only(
-                      left: 5,
-                      right: 5,
-                      bottom: 10,
-                    ),
+                    padding: const EdgeInsets.only(left: 5, right: 5, bottom: 10),
                     child: Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.black87,
-                      ),
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
                     ),
                   ),
 
                   // CONTEÚDO
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: content,
-                  ),
+                  Padding(padding: const EdgeInsets.only(bottom: 10), child: content),
 
                   // BOTÕES
                   if (actions != null && actions.length > 2)
@@ -76,10 +63,7 @@ class DialogHelper {
                       mainAxisSize: MainAxisSize.max,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: actions.map((e) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: e,
-                        );
+                        return Padding(padding: const EdgeInsets.only(left: 8.0), child: e);
                       }).toList(),
                     ),
                 ],

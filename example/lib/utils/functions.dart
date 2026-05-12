@@ -18,22 +18,10 @@ Future<PagSeguroEnum?> payMethodDialog(BuildContext context) async {
     title: 'Método de Pagamento',
     content: const Text('Selecione uma Forma de Pagamento.'),
     actions: [
-      DialogHelper.primaryButton(
-        'Crédito à Vista',
-        () => Navigator.pop(context, PagSeguroEnum.tCredit),
-      ),
-      DialogHelper.primaryButton(
-        'Débito',
-        () => Navigator.pop(context, PagSeguroEnum.tDebit),
-      ),
-      DialogHelper.primaryButton(
-        'Voucher',
-        () => Navigator.pop(context, PagSeguroEnum.tVoucher),
-      ),
-      DialogHelper.primaryButton(
-        'PIX (QrCode)',
-        () => Navigator.pop(context, PagSeguroEnum.tPix),
-      ),
+      DialogHelper.primaryButton('Crédito à Vista', () => Navigator.pop(context, PagSeguroEnum.tCredit)),
+      DialogHelper.primaryButton('Débito', () => Navigator.pop(context, PagSeguroEnum.tDebit)),
+      DialogHelper.primaryButton('Voucher', () => Navigator.pop(context, PagSeguroEnum.tVoucher)),
+      DialogHelper.primaryButton('PIX (QrCode)', () => Navigator.pop(context, PagSeguroEnum.tPix)),
       DialogHelper.secondaryButton('Cancelar', () => Navigator.pop(context)),
     ],
   );
@@ -75,9 +63,7 @@ Future<void> userDialog(BuildContext context, UserDataModel model) async {
         Text('Complemento: ${model.addressComplement}'),
       ],
     ),
-    actions: [
-      DialogHelper.primaryButton('Entendi', () => Navigator.pop(context)),
-    ],
+    actions: [DialogHelper.primaryButton('Entendi', () => Navigator.pop(context))],
   );
 }
 
@@ -87,9 +73,7 @@ Future<void> serialDialog(BuildContext context, String serialNumber) async {
     context: context,
     title: 'Número de Série',
     content: Text('Nº Série: $serialNumber'),
-    actions: [
-      DialogHelper.primaryButton('Entendi', () => Navigator.pop(context)),
-    ],
+    actions: [DialogHelper.primaryButton('Entendi', () => Navigator.pop(context))],
   );
 }
 
@@ -100,18 +84,9 @@ Future<String> receiptDialog(BuildContext context) async {
     title: 'Reimpressão de Via',
     content: const Text('Selecione o tipo da impressão desejada:'),
     actions: [
-      DialogHelper.primaryButton(
-        'Via Cliente (SMS)',
-        () => Navigator.pop(context, 'sms'),
-      ),
-      DialogHelper.primaryButton(
-        'Via Cliente',
-        () => Navigator.pop(context, 'customer'),
-      ),
-      DialogHelper.primaryButton(
-        'Via Loja',
-        () => Navigator.pop(context, 'establishment'),
-      ),
+      DialogHelper.primaryButton('Via Cliente (SMS)', () => Navigator.pop(context, 'sms')),
+      DialogHelper.primaryButton('Via Cliente', () => Navigator.pop(context, 'customer')),
+      DialogHelper.primaryButton('Via Loja', () => Navigator.pop(context, 'establishment')),
       DialogHelper.secondaryButton('Cancelar', () => Navigator.pop(context)),
     ],
   );
@@ -124,10 +99,7 @@ Future<String> receiptDialog(BuildContext context) async {
 Future<String> celPhoneDialog(BuildContext context) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController celController = TextEditingController();
-  final MaskTextInputFormatter celMask = MaskTextInputFormatter(
-    mask: '(##) #.####-####',
-    filter: {'#': RegExp(r'[0-9]')},
-  );
+  final MaskTextInputFormatter celMask = MaskTextInputFormatter(mask: '(##) #.####-####', filter: {'#': RegExp(r'[0-9]')});
 
   final result = await DialogHelper.showBottom<String>(
     context: context,

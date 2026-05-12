@@ -1,24 +1,8 @@
 class Constants {
   /// Variáveis para controle de cancelamento
-  static const List<String> allowWords = [
-    'aproxime',
-    'insira',
-    'chip',
-    'verifique',
-    'inserido'
-  ];
-  static const List<String> denyWords = [
-    'retire',
-    'tempo',
-    'permitida',
-    'atualizando',
-    'selecionado',
-    'senha'
-  ];
-  static const List<String> allowPhrases = [
-    'servico ocupado',
-    'nao tente novamente'
-  ];
+  static const List<String> allowWords = ['aproxime', 'insira', 'chip', 'verifique', 'inserido'];
+  static const List<String> denyWords = ['retire', 'tempo', 'permitida', 'atualizando', 'selecionado', 'senha'];
+  static const List<String> allowPhrases = ['servico ocupado', 'nao tente novamente'];
   static const List<String> denyPhrases = [
     'transação autorizada',
     'transação não autorizada',

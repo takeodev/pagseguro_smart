@@ -19,14 +19,9 @@ class PaymentTab extends StatefulWidget {
 }
 
 class _PaymentTabState extends State<PaymentTab> {
-  final TextEditingController activationCodeController = TextEditingController(
-    text: '749879',
-  );
+  final TextEditingController activationCodeController = TextEditingController(text: '749879');
 
-  final MoneyMaskedTextController moneyController = MoneyMaskedTextController(
-    leftSymbol: 'R\$ ',
-    decimalSeparator: ',',
-  );
+  final MoneyMaskedTextController moneyController = MoneyMaskedTextController(leftSymbol: 'R\$ ', decimalSeparator: ',');
 
   @override
   void dispose() {
@@ -51,13 +46,7 @@ class _PaymentTabState extends State<PaymentTab> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Text(
-                      'Ativação do PinPad',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text('Ativação do PinPad', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                     const SizedBox(height: 12),
                     Row(
                       children: [
@@ -73,19 +62,14 @@ class _PaymentTabState extends State<PaymentTab> {
                         ),
                         const SizedBox(width: 8),
                         ElevatedButton.icon(
-                          onPressed: () => payProv.activatePinPad(
-                            activationCodeController.text.trim(),
-                          ),
+                          onPressed: () => payProv.activatePinPad(activationCodeController.text.trim()),
                           icon: const Icon(Icons.lock_open),
                           label: const Text('Ativar'),
                         ),
                       ],
                     ),
                     if (payProv.displayMessage.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Text(payProv.displayMessage),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 12), child: Text(payProv.displayMessage)),
                   ],
                 ),
               ),
@@ -99,13 +83,7 @@ class _PaymentTabState extends State<PaymentTab> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    const Text(
-                      'Pagamento',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const Text('Pagamento', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
 
                     const SizedBox(height: 12),
 
@@ -113,10 +91,7 @@ class _PaymentTabState extends State<PaymentTab> {
                       enabled: payProv.isActivated && !payProv.isInProgress,
                       controller: moneyController,
                       keyboardType: TextInputType.number,
-                      decoration: const InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'R\$ 0,00',
-                      ),
+                      decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'R\$ 0,00'),
                       onChanged: (v) {
                         if (moneyController.numberValue < 1) {
                           payProv.displayMessage = 'Valor mínimo R\$1,00';
@@ -125,10 +100,7 @@ class _PaymentTabState extends State<PaymentTab> {
                     ),
 
                     if (payProv.displayMessage.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 12),
-                        child: Text(payProv.displayMessage),
-                      ),
+                      Padding(padding: const EdgeInsets.only(top: 12), child: Text(payProv.displayMessage)),
 
                     if (payProv.isLoading)
                       const Padding(
@@ -140,31 +112,19 @@ class _PaymentTabState extends State<PaymentTab> {
 
                     if (!payProv.isInProgress)
                       ElevatedButton.icon(
-                        onPressed: payProv.isActivated
-                            ? () => payProv.doPayment(
-                                context,
-                                moneyController.numberValue,
-                              )
-                            : null,
+                        onPressed: payProv.isActivated ? () => payProv.doPayment(context, moneyController.numberValue) : null,
                         icon: const Icon(Icons.check_circle),
                         label: const Text('Realizar Pagamento'),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
+                        style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 50)),
                       ),
 
                     const SizedBox(height: 8),
 
                     ElevatedButton.icon(
-                      onPressed: payProv.canAbort
-                          ? () => payProv.abortTransaction()
-                          : null,
+                      onPressed: payProv.canAbort ? () => payProv.abortTransaction() : null,
                       icon: const Icon(Icons.cancel),
                       label: const Text('Cancelar Transação'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent,
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent, minimumSize: const Size(double.infinity, 50)),
                     ),
                   ],
                 ),

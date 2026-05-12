@@ -123,7 +123,6 @@ class LayoutPresets {
 
   static StyleDataModel? of(LayoutPreset? preset) {
     if (preset == null) return null;
-    return _presets[preset] ??
-        (throw ArgumentError('LayoutPreset Inexistente: $preset'));
+    return _presets[preset] ?? (throw ArgumentError('LayoutPreset Inexistente: $preset'));
   }
 }

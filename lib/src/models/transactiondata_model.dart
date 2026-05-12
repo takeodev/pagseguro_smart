@@ -133,8 +133,7 @@ class TransactionDataModel {
       'currentBalance': currentBalance?.trim(),
       'consumerPhoneNumber': consumerPhoneNumber?.trim(),
       'clubePagScreensIds': clubePagScreensIds?.trim(),
-      'partialPayPartiallyAuthorizedAmount':
-          partialPayPartiallyAuthorizedAmount?.trim(),
+      'partialPayPartiallyAuthorizedAmount': partialPayPartiallyAuthorizedAmount?.trim(),
       'partialPayRemainingAmount': partialPayRemainingAmount?.trim(),
       'pixTxIdCode': pixTxIdCode?.trim(),
     }..removeWhere((_, value) => value == null || value == '');
@@ -190,8 +189,7 @@ class TransactionDataModel {
         currentBalance: map['currentBalance'] as String?,
         consumerPhoneNumber: map['consumerPhoneNumber'] as String?,
         clubePagScreensIds: map['clubePagScreensIds'] as String?,
-        partialPayPartiallyAuthorizedAmount:
-            map['partialPayPartiallyAuthorizedAmount'] as String?,
+        partialPayPartiallyAuthorizedAmount: map['partialPayPartiallyAuthorizedAmount'] as String?,
         partialPayRemainingAmount: map['partialPayRemainingAmount'] as String?,
         pixTxIdCode: map['pixTxIdCode'] as String?,
       );

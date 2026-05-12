@@ -333,12 +333,7 @@ class PaymentProvider extends ChangeNotifier {
         displayMessage = message;
         BotToast.showText(text: message);
       } else {
-        final result = await pagSeguro.doPayment(
-          type: payType,
-          value: value,
-          userReference: 't${payType.code}p123',
-          printReceipt: false,
-        );
+        final result = await pagSeguro.doPayment(type: payType, value: value, userReference: 't${payType.code}p123', printReceipt: false);
 
         if (!isAbortTapped) {
           final model = TransactionDataModel.fromMap(result['data']);
@@ -381,9 +376,7 @@ class PaymentProvider extends ChangeNotifier {
         await Future.delayed(const Duration(milliseconds: 100));
       }
 
-      message = (result['success'] ?? false)
-          ? 'Transação Cancelada!'
-          : result['message'];
+      message = (result['success'] ?? false) ? 'Transação Cancelada!' : result['message'];
 
       displayMessage = message;
       BotToast.showText(text: message);
@@ -401,14 +394,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTORNAR TRANSAÇÃO
   // ============================================================
-  Future<void> voidPayment(
-    BuildContext context, {
-    PagSeguroEnum voidType = PagSeguroEnum.vCommon,
-  }) async {
-    if (transactionCode == null ||
-        transactionId == null ||
-        transactionCode!.isEmpty ||
-        transactionId!.isEmpty) {
+  Future<void> voidPayment(BuildContext context, {PagSeguroEnum voidType = PagSeguroEnum.vCommon}) async {
+    if (transactionCode == null || transactionId == null || transactionCode!.isEmpty || transactionId!.isEmpty) {
       BotToast.showText(text: 'Não Identificada Última Transação');
       return;
     }
@@ -524,10 +511,7 @@ class PaymentProvider extends ChangeNotifier {
           if (cel == null || cel.isEmpty) {
             message = 'Cancelado Recibo via SMS';
           } else {
-            final result = await pagSeguro.sendReceiptSMS(
-              transactionCode: transactionCode!,
-              phoneNumber: cel,
-            );
+            final result = await pagSeguro.sendReceiptSMS(transactionCode: transactionCode!, phoneNumber: cel);
             message = result['message']!;
           }
         } else {
@@ -552,11 +536,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // CONFIGURAR IMPRESSÃO DE RECIBO DO CLIENTE
   // ============================================================
-  Future<void> setPrintActionListener({
-    bool askReceipt = true,
-    bool smsReceipt = false,
-    bool directReceipt = false,
-  }) async {
+  Future<void> setPrintActionListener({bool askReceipt = true, bool smsReceipt = false, bool directReceipt = false}) async {
     if (isTapped) return;
     isTapped = true;
 
@@ -567,11 +547,7 @@ class PaymentProvider extends ChangeNotifier {
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.setPrintActionListener(
-        askReceipt: askReceipt,
-        smsReceipt: smsReceipt,
-        directReceipt: directReceipt,
-      );
+      final result = await pagSeguro.setPrintActionListener(askReceipt: askReceipt, smsReceipt: smsReceipt, directReceipt: directReceipt);
 
       message = result['message'] ?? '';
       askPrint = askReceipt;
@@ -595,11 +571,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DO RECIBO DO CLIENTE
   // ============================================================
-  Future<void> setPlugPagCustomPrinterLayout({
-    String? title,
-    LayoutPreset? layoutPreset,
-    int maxTimeShowPopup = 20,
-  }) async {
+  Future<void> setPlugPagCustomPrinterLayout({String? title, LayoutPreset? layoutPreset, int maxTimeShowPopup = 20}) async {
     if (isTapped) return;
     isTapped = true;
 
@@ -638,11 +610,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DE JANELAS PAGSEGURO & JANELA DE RECIBO
   // ============================================================
-  Future<void> setFullStyleData({
-    String? title,
-    LayoutPreset? layoutPreset,
-    int maxTimeShowPopup = 20,
-  }) async {
+  Future<void> setFullStyleData({String? title, LayoutPreset? layoutPreset, int maxTimeShowPopup = 20}) async {
     if (isStyleTapped) return;
     isStyleTapped = true;
 
