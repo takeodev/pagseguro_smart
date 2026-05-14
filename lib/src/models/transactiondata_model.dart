@@ -44,6 +44,11 @@ class TransactionDataModel {
   final String? partialPayPartiallyAuthorizedAmount;
   final String? partialPayRemainingAmount;
   final String? pixTxIdCode;
+  final bool? isDcc;
+  final String? foreignAmount;
+  final String? currencyDestinyLabel;
+  final String? currencyOriginLabel;
+  final int? minorUnitsForeign;
 
   const TransactionDataModel({
     this.message,
@@ -87,6 +92,11 @@ class TransactionDataModel {
     this.partialPayPartiallyAuthorizedAmount,
     this.partialPayRemainingAmount,
     this.pixTxIdCode,
+    this.isDcc,
+    this.foreignAmount,
+    this.currencyDestinyLabel,
+    this.currencyOriginLabel,
+    this.minorUnitsForeign,
   });
 
   /// Construtor vazio
@@ -136,6 +146,11 @@ class TransactionDataModel {
       'partialPayPartiallyAuthorizedAmount': partialPayPartiallyAuthorizedAmount?.trim(),
       'partialPayRemainingAmount': partialPayRemainingAmount?.trim(),
       'pixTxIdCode': pixTxIdCode?.trim(),
+      'isDcc': isDcc,
+      'foreignAmount': foreignAmount?.trim(),
+      'currencyDestinyLabel': currencyDestinyLabel?.trim(),
+      'currencyOriginLabel': currencyOriginLabel?.trim(),
+      'minorUnitsForeign': minorUnitsForeign,
     }..removeWhere((_, value) => value == null || value == '');
 
     return map;
@@ -192,6 +207,11 @@ class TransactionDataModel {
         partialPayPartiallyAuthorizedAmount: map['partialPayPartiallyAuthorizedAmount'] as String?,
         partialPayRemainingAmount: map['partialPayRemainingAmount'] as String?,
         pixTxIdCode: map['pixTxIdCode'] as String?,
+        isDcc: map['isDcc'] as bool? ?? false,
+        foreignAmount: map['foreignAmount'] as String?,
+        currencyDestinyLabel: map['currencyDestinyLabel'] as String?,
+        currencyOriginLabel: map['currencyOriginLabel'] as String?,
+        minorUnitsForeign: map['minorUnitsForeign'] as int? ?? 2,
       );
     } catch (_) {
       return TransactionDataModel.empty();

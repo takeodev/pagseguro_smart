@@ -1,5 +1,10 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.3.1
+
+- [Upgrade] "_TransactionDataModel_" do Wrapper PagSeguro, novos campos: "pixTxIdCode", "isDcc", "foreignAmount", "currencyDestinyLabel".
+- [Upgrade] "_TransactionDataModel_" do Wrapper PagSeguro, novos campos: "currencyOriginLabel", "minorUnitsForeign".
+
 ## 1.3.0
 
 - [Upgrade] Package "_flutter_lints_", "~~_5.0.0_~~" => "_6.0.0_".
