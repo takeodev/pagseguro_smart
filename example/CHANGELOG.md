@@ -1,5 +1,10 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
+## 1.0.13
+
+- [Improve] Formatação de Código Dart com Dimensão de Linha em 140 (afetou 8 arquivos).
+- [Improve] Atualizado README.
+
 ## 1.0.12
 
 - [Upgrade] Wrapper da PagSeguro "~~_1.30.52_~~" => "_1.33.0_".

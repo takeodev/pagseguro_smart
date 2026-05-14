@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.3.2
+
+- [Improve] Atualizado README.
+
 ## 1.3.1
 
 - [Upgrade] "_TransactionDataModel_" do Wrapper PagSeguro, novos campos: "pixTxIdCode", "isDcc", "foreignAmount", "currencyDestinyLabel".
@@ -7,14 +11,6 @@
 
 ## 1.3.0
 
-- [Upgrade] Package "_flutter_lints_", "~~_5.0.0_~~" => "_6.0.0_".
-- [Upgrade] Package "_lints_", "~~_5.1.1_~~" => "_6.1.0_".
-- [Upgrade] Package "_matcher_", "~~_0.12.18_~~" => "_0.12.19_".
-- [Upgrade] Package "_test_api_", "~~_0.7.9_~~" => "_0.7.10_".
-- [Upgrade] Package "_async_", "~~_2.13.0_~~" => "_2.13.1_".
-- [Upgrade] Package "_source_span_", "~~_1.10.1_~~" => "_1.10.2_".
-- [Upgrade] Package "_vm_service_", "~~_15.0.2_~~" => "_15.2.0_".
-- [Upgrade] Tool "_dart_", "~~_3.41.2_~~" => "_3.41.6_".
 - [Improve] Formatação de Código Dart com Dimensão de Linha em 140 (afetou 20 arquivos).
 
 ## 1.2.9

@@ -28,6 +28,12 @@ Exemplo de integração com o pacote `pagseguro_smart`.
 
 ---
 
+## ⚖️ Licença
+
+MIT © 2025 **Fernando Takeo Miyaji**
+
+---
+
 ## ⭐ Contribuições
 
 Pull Requests são sempre Bem Vindos!  
