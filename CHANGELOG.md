@@ -1,5 +1,9 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.3.3
+
+- [Upgrade] Wrapper da PagSeguro "~~_1.33.0_~~" => "_1.35.0_".
+
 ## 1.3.2
 
 - [Improve] Atualizado README.
