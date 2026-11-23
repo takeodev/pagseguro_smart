@@ -2,6 +2,10 @@ import 'dart:convert';
 
 /// Modelo de Dados de Transação / Pagamento (PlugPagTransactionResult)
 /// Documentação: https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/-wrapper-p-p-s/br.com.uol.pagseguro.plugpagservice.wrapper/-plug-pag-transaction-result/index.html
+/// Todos os campos são opcionais e vêm como texto do Wrapper, exceto os marcados como `int`/`bool`.
+/// Valores monetários (`amount`, `originalAmount`, `foreignAmount`) seguem o formato devolvido pelo Wrapper.
+/// Atenção LGPD: `holder`, `buyerName`, `consumerIdentification`, `consumerPhoneNumber` e `cardHash`
+/// são dados pessoais ou do cartão; não os registre em logs nem os exiba sem necessidade.
 class TransactionDataModel {
   final String? message;
   final String? errorCode;
@@ -15,6 +19,8 @@ class TransactionDataModel {
   final String? holder;
   final String? userReference;
   final String? terminalSerialNumber;
+
+  /// Valor da transação (texto no formato do Wrapper)
   final String? amount;
   final String? availableBalance;
   final String? cardApplication;

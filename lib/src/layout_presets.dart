@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:pagseguro_smart/src/models/styledata_model.dart';
 
-enum LayoutPreset {
-  pagSeguro,
-  darkBlue,
-  darkGreen,
-  lightCustom,
-  warmSunset,
-  warmLight,
-}
+/// Temas prontos de cores para as telas de pagamento e recibo da maquininha.
+/// Use com [LayoutPresets.of] e passe as cores do resultado a `setStyleData`.
+enum LayoutPreset { pagSeguro, darkBlue, darkGreen, lightCustom, warmSunset, warmLight }
 
+/// Tabela de cores de cada [LayoutPreset] (valores em ARGB, `0xAARRGGBB`).
 class LayoutPresets {
+  // Mapa constante: cada tema define as cores de cabeçalho, conteúdo, botões, SMS e linhas
   static final Map<LayoutPreset, StyleDataModel> _presets = {
     /// PagSeguro
     LayoutPreset.pagSeguro: const StyleDataModel(
@@ -121,6 +118,8 @@ class LayoutPresets {
     ),
   };
 
+  /// Retorna o estilo do [preset]. Retorna `null` se [preset] for `null` (sem estilo personalizado).
+  /// Lança [ArgumentError] apenas se o preset não estiver cadastrado no mapa.
   static StyleDataModel? of(LayoutPreset? preset) {
     if (preset == null) return null;
     return _presets[preset] ?? (throw ArgumentError('LayoutPreset Inexistente: $preset'));

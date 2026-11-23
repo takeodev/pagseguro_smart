@@ -1,5 +1,7 @@
 /// Modelo de Dados do Usuário (PlugPagUserDataResult)
 /// Documentação: https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/-wrapper-p-p-s/br.com.uol.pagseguro.plugpagservice.wrapper/-plug-pag-user-data-result/index.html
+/// Todos os campos são opcionais: o Wrapper pode não preencher algum deles.
+/// Atenção LGPD: e-mail, CNPJ/CPF e endereço são dados pessoais; não os registre em logs.
 class UserDataModel {
   final String? userNickName;
   final String? email;

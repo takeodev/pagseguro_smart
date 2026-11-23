@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 /// Modelo de Dados de Layout e Estilo de Janelas PagSeguro (PlugPagStyleData)
 /// Documentação: https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/-wrapper-p-p-s/br.com.uol.pagseguro.plugpagservice.wrapper/-plug-pag-style-data/index.html
 class StyleDataModel {
+  /// Cores usadas pelo Wrapper nas telas (cabeçalho, conteúdo, botões, SMS e linhas).
+  /// Enviadas a `setStyleData` como inteiros ARGB.
   final Color headTextColor;
   final Color headBackgroundColor;
   final Color contentTextColor;
