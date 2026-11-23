@@ -46,7 +46,8 @@ Future<bool> voidDialog(BuildContext context) async {
   return result ?? false;
 }
 
-/// Exibe Diálogo informando Dados do Usuário
+/// Exibe Diálogo informando Dados do Usuário (dono da maquininha).
+/// Atenção LGPD: mostra CPF/CNPJ, e-mail e endereço na tela; não copie esses dados para logs.
 Future<void> userDialog(BuildContext context, UserDataModel model) async {
   await DialogHelper.showBottom<void>(
     context: context,
@@ -77,7 +78,8 @@ Future<void> serialDialog(BuildContext context, String serialNumber) async {
   );
 }
 
-/// Exibe Diálogo perguntando o tipo de Via do Recibo
+/// Exibe Diálogo perguntando o tipo de Via do Recibo.
+/// Retorna `'sms'`, `'customer'`, `'establishment'` ou `''` (cancelado), que é o que `reprintReceipt` espera.
 Future<String> receiptDialog(BuildContext context) async {
   final result = await DialogHelper.showBottom<String>(
     context: context,
@@ -95,7 +97,9 @@ Future<String> receiptDialog(BuildContext context) async {
   return result ?? '';
 }
 
-/// Exibe Diálogo solicitando o Preenchimento de Celular para Receber o Recibo via SMS
+/// Exibe Diálogo solicitando o Preenchimento de Celular para Receber o Recibo via SMS.
+/// Máscara (XX) X.XXXX-XXXX; valida 11 dígitos e retorna o número no formato `+55 XXXXXXXXXXX`,
+/// ou string vazia se cancelado. Atenção LGPD: é dado pessoal, usado só para o envio.
 Future<String> celPhoneDialog(BuildContext context) async {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController celController = TextEditingController();

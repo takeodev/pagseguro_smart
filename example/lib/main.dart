@@ -1,6 +1,6 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:example/brain/payment_provider.dart';
-import 'package:example/ui/main_screen.dart';
+import 'package:example/ui/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -12,6 +12,8 @@ import 'package:provider/provider.dart';
 /// Autor           : Fernando Takeo Miyaji
 /// ======================================================================================
 
+/// Ponto de entrada do App Example. O [PaymentProvider] é criado aqui, uma única vez, e
+/// disponibilizado às telas pelo Provider; o BotToast mostra as mensagens de status.
 void main() {
   runApp(
     MultiProvider(
@@ -21,6 +23,7 @@ void main() {
   );
 }
 
+/// Raiz do App: MaterialApp com o BotToast (mensagens flutuantes) e a [SplashScreen] como tela inicial (ela abre a MainScreen).
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -30,7 +33,7 @@ class MyApp extends StatelessWidget {
       navigatorObservers: [BotToastNavigatorObserver()],
       builder: BotToastInit(),
       title: 'PagSeguro Smart Demo',
-      home: const MainScreen(),
+      home: const SplashScreen(), // abre com a splash animada e depois vai para a MainScreen
     );
   }
 }

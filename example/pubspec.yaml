@@ -2,7 +2,7 @@ name: example
 description: "Exemplo de Utilização do Plugin em Flutter para integração com o PlugPagServiceWrapper da PagSeguro."
 
 publish_to: 'none'
-version: 1.0.13
+version: 1.1.1
 
 environment:
   sdk: ^3.9.2
@@ -25,6 +25,19 @@ dev_dependencies:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+  # Gera os ícones do app (Android) a partir do logo do desenvolvedor: dart run flutter_launcher_icons
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
+  assets:
+    - assets/logo_takeo.png
+
+# Configuração do flutter_launcher_icons (ícone do App Example com o logo do desenvolvedor)
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: assets/icon/app_icon.png
+  min_sdk_android: 23
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: assets/icon/app_icon_foreground.png

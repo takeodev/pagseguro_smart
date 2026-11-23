@@ -11,22 +11,38 @@ import 'package:pagseguro_smart/pagseguro_smart.dart';
 /// Autor           : Fernando Takeo Miyaji
 /// ======================================================================================
 
+/// Estado e regras do Example (camada de negócio entre as abas e o [PagSeguroService]).
+/// Cada ação do App é um método: ele marca o estado (ex.: `isLoading`), chama o plugin, mostra a mensagem
+/// (`displayMessage` e BotToast) e avisa a tela com `notifyListeners`. O plugin responde sempre com
+/// `{success, message, data}`, usado para decidir o que atualizar.
 class PaymentProvider extends ChangeNotifier {
+  /// Única instância do plugin usada pelo App. Não crie outra: o canal é compartilhado (ver PagSeguroService).
   final PagSeguroService pagSeguro = PagSeguroService();
 
   // Ações de Click para Prevenção de Múltiplos Clicks
+  // Cada flag é ligada enquanto a ação correspondente roda e impede um segundo clique até terminar
   bool isTapped = false;
   bool isAbortTapped = false;
   bool isServiceTapped = false;
   bool isStyleTapped = false;
 
   // Estado da Maquininha ou Pagamento
+  /// PinPad ativado (libera as ações que usam o plugin)
   bool isActivated = false;
+
+  /// Venda em andamento (entre o início e o fim do doPayment); o botão Cancelar depende disso
   bool isInProgress = false;
+
+  /// Cancelamento liberado pela maquininha (vem do onPaymentProgress do plugin)
   bool canAbort = false;
+
+  /// Indicador de carregamento na tela
   bool isLoading = false;
 
-  // Configurações
+  // Modo de Execução: Assíncrono (listeners do Wrapper) ou Síncrono
+  bool useAsync = false;
+
+  // Configurações do recibo do cliente (espelham o último setPrintActionListener com sucesso)
   LayoutPreset? actualPreset;
   bool askPrint = true;
   bool smsPrint = false;
@@ -34,10 +50,13 @@ class PaymentProvider extends ChangeNotifier {
 
   // Dados a Serem Exibidos
   String displayMessage = '';
+
+  /// Dados da última transação aprovada, usados por estorno e 2ª via (ficam só em memória)
   String? transactionCode;
   String? transactionId;
 
   // Listener da Ação de Pagamento
+  // Mensagens de progresso da maquininha: mostra na tela e atualiza se o cancelamento está liberado
   PaymentProvider() {
     pagSeguro.onPaymentProgress = (msg, abort) {
       bool hasChange = false;
@@ -58,8 +77,20 @@ class PaymentProvider extends ChangeNotifier {
   }
 
   // ============================================================
+  // MODO DE EXECUÇÃO (SÍNCRONO / ASSÍNCRONO)
+  // ============================================================
+  /// Liga/desliga o modo assíncrono. Não muda nada durante uma operação em andamento.
+  void setUseAsync(bool value) {
+    if (isInProgress || isLoading) return;
+    useAsync = value;
+    notifyListeners();
+  }
+
+  // ============================================================
   // VERIFICA AUTENTICAÇÃO DO PINPAD
   // ============================================================
+  /// Consulta se o PinPad está ativado. Atualiza `isActivated`, que decide se a aba mostra
+  /// o campo de ativação ou os pagamentos. Retorna o mesmo valor.
   Future<bool> isAuthenticated() async {
     if (isTapped) return false;
     isTapped = true;
@@ -73,7 +104,7 @@ class PaymentProvider extends ChangeNotifier {
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.isAuthenticated();
+      final result = await (useAsync ? pagSeguro.asyncIsAuthenticated() : pagSeguro.isAuthenticated());
       message = result['message'] ?? '';
       isActivated = result['success'];
       displayMessage = message;
@@ -93,6 +124,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ATIVAR PINPAD
   // ============================================================
+  /// Ativa o PinPad com [code] (código de ativação digitado na aba Pagamento). Código vazio é recusado sem chamar o plugin.
   Future<void> activatePinPad(String code) async {
     if (code.isEmpty) {
       BotToast.showText(text: 'Informe o Código de Ativação');
@@ -110,7 +142,7 @@ class PaymentProvider extends ChangeNotifier {
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.initPinPad(code);
+      final result = await (useAsync ? pagSeguro.asyncInitPinPad(code) : pagSeguro.initPinPad(code));
       message = result['message'] ?? '';
       isActivated = result['success'];
       displayMessage = message;
@@ -129,6 +161,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // DADOS DO USUÁRIO
   // ============================================================
+  /// Busca os dados do dono da maquininha e mostra em uma janela. Atenção LGPD: são dados pessoais, não logar.
   Future<void> getUserData(BuildContext context) async {
     if (isTapped) return;
     isTapped = true;
@@ -164,6 +197,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // NÚMERO DE SÉRIE
   // ============================================================
+  /// Busca o número de série e mostra em uma janela.
   Future<void> getSerialNumber(BuildContext context) async {
     if (isTapped) return;
     isTapped = true;
@@ -197,6 +231,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // REINICIAR DISPOSITIVO
   // ============================================================
+  /// Pede confirmação ao operador e, se confirmado, reinicia a maquininha.
   Future<void> rebootDevice(BuildContext context) async {
     if (isTapped) return;
     isTapped = true;
@@ -230,6 +265,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // VERIFICADOR DE SERVIÇO
   // ============================================================
+  /// Consulta se o serviço PagSeguro está ocupado. Retorna `true` (ocupado) por padrão se a consulta falhar,
+  /// para não sugerir que o serviço está livre sem confirmação.
   Future<bool> isServiceBusy() async {
     bool isBusy = true;
     if (isServiceTapped) return isBusy;
@@ -262,6 +299,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DE JANELAS PAGSEGURO
   // ============================================================
+  /// Aplica as cores de [layoutPreset] às janelas da maquininha (sem o recibo). `null` envia cores vazias.
   Future<void> setStyleData(LayoutPreset? layoutPreset) async {
     if (isTapped) return;
     isTapped = true;
@@ -308,6 +346,9 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // REALIZAR PAGAMENTO
   // ============================================================
+  /// Realiza uma venda de [value] (em Reais, mínimo R$ 1,00). Antes, o operador escolhe a forma de
+  /// pagamento (crédito, débito, PIX...) em um diálogo; cancelar o diálogo encerra sem chamar o plugin.
+  /// Usa `doAsyncPayment` ou `doPayment` conforme [useAsync] e guarda o código da transação para estorno.
   Future<void> doPayment(BuildContext context, double value) async {
     if (value < 1) {
       BotToast.showText(text: 'Valor Mínimo de R\$1,00');
@@ -333,7 +374,9 @@ class PaymentProvider extends ChangeNotifier {
         displayMessage = message;
         BotToast.showText(text: message);
       } else {
-        final result = await pagSeguro.doPayment(type: payType, value: value, userReference: 't${payType.code}p123', printReceipt: false);
+        final result = useAsync
+            ? await pagSeguro.doAsyncPayment(type: payType, value: value, userReference: 't${payType.code}p123', printReceipt: false)
+            : await pagSeguro.doPayment(type: payType, value: value, userReference: 't${payType.code}p123', printReceipt: false);
 
         if (!isAbortTapped) {
           final model = TransactionDataModel.fromMap(result['data']);
@@ -360,6 +403,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ABORTAR TRANSAÇÃO
   // ============================================================
+  /// Pede o cancelamento da venda em andamento. Só funciona se `canAbort` (maquininha liberou).
+  /// Depois do pedido, espera `isInProgress` virar false (a venda termina) antes de mostrar o resultado final.
   Future<void> abortTransaction() async {
     if (isAbortTapped || !canAbort) return;
     isAbortTapped = true;
@@ -370,7 +415,7 @@ class PaymentProvider extends ChangeNotifier {
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.abortTransaction();
+      final result = await (useAsync ? pagSeguro.asyncAbortTransaction() : pagSeguro.abortTransaction());
 
       while (isInProgress) {
         await Future.delayed(const Duration(milliseconds: 100));
@@ -394,6 +439,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTORNAR TRANSAÇÃO
   // ============================================================
+  /// Estorna a última transação guardada em [transactionCode]/[transactionId]. O operador escolhe se quer
+  /// imprimir o recibo do estorno. Em caso de sucesso, limpa os códigos (o botão Estornar é desabilitado).
   Future<void> voidPayment(BuildContext context, {PagSeguroEnum voidType = PagSeguroEnum.vCommon}) async {
     if (transactionCode == null || transactionId == null || transactionCode!.isEmpty || transactionId!.isEmpty) {
       BotToast.showText(text: 'Não Identificada Última Transação');
@@ -415,7 +462,7 @@ class PaymentProvider extends ChangeNotifier {
     bool printReceipt = await voidDialog(context);
 
     try {
-      final result = await pagSeguro.voidPayment(
+      final result = await (useAsync ? pagSeguro.asyncVoidPayment : pagSeguro.voidPayment)(
         transactionCode: transactionCode!,
         transactionId: transactionId!,
         printReceipt: printReceipt,
@@ -447,6 +494,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // OBTER CÓDIGO DA ÚLTIMA TRANSAÇÃO
   // ============================================================
+  /// Busca a última transação aprovada na maquininha e guarda seus códigos para estorno e 2ª via.
   Future<void> getLastTransaction() async {
     if (isTapped) return;
     isTapped = true;
@@ -458,7 +506,7 @@ class PaymentProvider extends ChangeNotifier {
     BotToast.showText(text: message);
 
     try {
-      final result = await pagSeguro.getLastTransaction();
+      final result = await (useAsync ? pagSeguro.asyncGetLastTransaction() : pagSeguro.getLastTransaction());
 
       final model = TransactionDataModel.fromMap(result['data']);
       transactionCode = model.transactionCode;
@@ -480,6 +528,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // REIMPRESSÃO DE RECIBO
   // ============================================================
+  /// 2ª via do recibo da última transação. O operador escolhe via do cliente, via da loja ou SMS
+  /// (para SMS, digita o celular). Atenção LGPD: o telefone é dado pessoal, usado só para o envio.
   Future<void> reprintReceipt(BuildContext context) async {
     if (transactionCode == null || transactionCode!.trim().isEmpty) {
       BotToast.showText(text: 'Não Identificada Última Transação');
@@ -536,6 +586,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // CONFIGURAR IMPRESSÃO DE RECIBO DO CLIENTE
   // ============================================================
+  /// Define o que fazer com o recibo do cliente ao fim de cada venda. Os campos `askPrint`, `smsPrint` e
+  /// `directPrint` só recebem o valor pedido quando o plugin responde `success: true` (senão mantêm o estado anterior).
   Future<void> setPrintActionListener({bool askReceipt = true, bool smsReceipt = false, bool directReceipt = false}) async {
     if (isTapped) return;
     isTapped = true;
@@ -550,15 +602,16 @@ class PaymentProvider extends ChangeNotifier {
       final result = await pagSeguro.setPrintActionListener(askReceipt: askReceipt, smsReceipt: smsReceipt, directReceipt: directReceipt);
 
       message = result['message'] ?? '';
-      askPrint = askReceipt;
-      smsPrint = smsReceipt;
-      directPrint = directReceipt;
+      // Só atualiza o estado exibido se o plugin confirmou; em falha mantém o último estado válido
+      if (result['success'] == true) {
+        askPrint = askReceipt;
+        smsPrint = smsReceipt;
+        directPrint = directReceipt;
+      }
       displayMessage = message;
       BotToast.showText(text: message);
     } catch (e) {
-      askPrint = true;
-      smsPrint = false;
-      directPrint = false;
+      // Exceção: o estado real é desconhecido, então não altera o que a tela mostra
       message = 'Erro ao Configurar Recibo do Cliente!';
       displayMessage = '$message\n$e';
     } finally {
@@ -571,6 +624,7 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DO RECIBO DO CLIENTE
   // ============================================================
+  /// Aplica só o estilo do recibo impresso (título, cores e tempo do popup em [maxTimeShowPopup]).
   Future<void> setPlugPagCustomPrinterLayout({String? title, LayoutPreset? layoutPreset, int maxTimeShowPopup = 20}) async {
     if (isTapped) return;
     isTapped = true;
@@ -610,6 +664,8 @@ class PaymentProvider extends ChangeNotifier {
   // ============================================================
   // ESTILO DE JANELAS PAGSEGURO & JANELA DE RECIBO
   // ============================================================
+  /// Aplica o tema completo: primeiro as janelas (`setStyleData`) e, só se der certo, o recibo
+  /// (`setPlugPagCustomPrinterLayout`). Usado pelos botões de layout da aba Comandos.
   Future<void> setFullStyleData({String? title, LayoutPreset? layoutPreset, int maxTimeShowPopup = 20}) async {
     if (isStyleTapped) return;
     isStyleTapped = true;

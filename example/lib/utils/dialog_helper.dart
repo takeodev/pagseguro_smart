@@ -8,7 +8,100 @@ import 'package:flutter/material.dart';
 /// Autor           : Fernando Takeo Miyaji
 /// ======================================================================================
 
+/// Área rolável para conteúdo de janelas. Deixa claro que há mais conteúdo: barra de rolagem sempre
+/// visível e, enquanto existir conteúdo abaixo, um degradê com o aviso "Role para ver mais" (some ao chegar no fim).
+/// Evita que a pessoa toque em "Entendi" sem ter lido tudo.
+class ScrollHintBox extends StatefulWidget {
+  final double maxHeight;
+  final Widget child;
+
+  const ScrollHintBox({super.key, required this.maxHeight, required this.child});
+
+  @override
+  State<ScrollHintBox> createState() => _ScrollHintBoxState();
+}
+
+class _ScrollHintBoxState extends State<ScrollHintBox> {
+  final ScrollController _controller = ScrollController();
+
+  /// true enquanto ainda há conteúdo abaixo da área visível
+  bool _hasMore = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_update);
+    // Depois do 1º layout já se sabe se o conteúdo ultrapassa a altura máxima
+    WidgetsBinding.instance.addPostFrameCallback((_) => _update());
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _update() {
+    if (!mounted || !_controller.hasClients || !_controller.position.hasContentDimensions) {
+      return;
+    }
+    final bool more = _controller.position.extentAfter > 8;
+    if (more != _hasMore) setState(() => _hasMore = more);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxHeight: widget.maxHeight),
+      child: Stack(
+        children: [
+          Scrollbar(
+            controller: _controller,
+            thumbVisibility: true,
+            child: SingleChildScrollView(controller: _controller, padding: const EdgeInsets.only(right: 12), child: widget.child),
+          ),
+          if (_hasMore)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: 0,
+              child: IgnorePointer(
+                child: Container(
+                  height: 56,
+                  alignment: Alignment.bottomCenter,
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Color(0x00FFFFFF), Colors.white],
+                    ),
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(color: Colors.black87, borderRadius: BorderRadius.circular(20)),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text('Role para ver mais', style: TextStyle(color: Colors.white, fontSize: 13)),
+                        SizedBox(width: 4),
+                        Icon(Icons.keyboard_arrow_down, color: Colors.white, size: 18),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Janelas padronizadas do Example: folha inferior com título, conteúdo e botões, e botões de ação.
 class DialogHelper {
+  /// Abre uma folha inferior (bottom sheet) com [title], [content] e [actions].
+  /// Com mais de 2 [actions] os botões ficam empilhados em largura total; com até 2, alinhados à direita.
+  /// [dismissible] = false impede fechar tocando fora da folha (o usuário precisa usar um botão).
   static Future<T?> showBottom<T>({
     required BuildContext context,
     required String title,
@@ -75,7 +168,7 @@ class DialogHelper {
     );
   }
 
-  // Botão Primário
+  /// Botão primário (verde) para a ação principal da janela
   static Widget primaryButton(String text, VoidCallback onTap) {
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
@@ -88,7 +181,7 @@ class DialogHelper {
     );
   }
 
-  // Botão Secundário
+  /// Botão secundário (texto simples) para ações de cancelar ou fechar
   static Widget secondaryButton(String text, VoidCallback onTap) {
     return TextButton(
       onPressed: onTap,
