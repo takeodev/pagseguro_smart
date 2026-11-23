@@ -25,15 +25,15 @@ import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
 
 
-/** Gerencia todas as operações de impressão **/
+/**
+ * Gerencia todas as operações de impressão e recibos: reimpressão (cliente e loja), envio por SMS,
+ * configuração do que fazer ao fim de uma venda (pergunta, SMS, impressão direta) e estilo do recibo.
+ **/
 class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineScope) {
 
     companion object {
         /** Tag utilizada nos logs */
         private const val TAG = "ReceiptManager"
-
-        /** Canal global para envio de progresso ao Flutter */
-        var plugPagChannel: MethodChannel? = null
     }
 
     /** Logger personalizado com TAG para identificar a Origem **/
@@ -45,7 +45,12 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
     private var smsReceipt: Boolean = false
     private var directReceipt: Boolean = false
         
-    /** Defina Listener de Impressão de Recibo do Cliente **/
+    /**
+     * Listener de Impressão de Recibo do Cliente, chamado pelo Wrapper ao fim de cada venda.
+     * Ordem de prioridade (a primeira flag ligada vence): `askReceipt` (pergunta ao cliente), `smsReceipt`
+     * (envia por SMS; sem telefone válido, cai na pergunta), `directReceipt` (imprime sem perguntar).
+     * Se nenhuma estiver ligada, o recibo é dispensado.
+     **/
     private val printListener = object : PlugPagPrintActionListener {
         override fun onPrint(
             phoneNumber: String?,
@@ -282,7 +287,10 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
         }
     }
 
-    /** Envia Recibo via SMS **/
+    /**
+     * Envia Recibo via SMS para o telefone informado, referente à [transactionCode].
+     * Atenção LGPD: o telefone é dado pessoal e não deve ir para os logs.
+     **/
     fun sendReceiptSMS(call: MethodCall, result: MethodChannel.Result) {
         val phoneNumber = call.argument<String>("phoneNumber") ?: ""
         val transactionCode = call.argument<String>("transactionCode") ?: ""
@@ -298,7 +306,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
             return
         }
 
-        // Validação de ID
+        // Validação do telefone (só verifica se não está vazio)
         if (phoneNumber.isEmpty()) {
             logger.warn("phoneNumber.isEmpty()", "Número do Celular Vazio!")
             result.success(mapOf(
@@ -339,7 +347,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                         )
                     }
                 }
-            } catch (e: PlugPagException) {
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     logger.error("sendReceiptSMS (PlugPagException)", "Erro ao Enviar SMS: ${e.message}")
                     result.success(mapOf(
@@ -352,7 +360,11 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
         }
     }
 
-    /** ReAplica Configurações de Impressão de Recibo do Cliente **/
+    /**
+     * ReAplica Configurações de Impressão de Recibo do Cliente.
+     * Chamado pelo PaymentManager antes de cada venda para que o listener registrado seja o da configuração
+     * atual. Não faz nada enquanto `setPrintActionListener` nunca tiver sido chamado ([changedReceipt] = false).
+     **/
     fun reapplyPrintActionListener() {
         logger.info("PlugPag Instance (reapplyPrintActionListener)", plugPag.hashCode().toString())
 
@@ -372,7 +384,11 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
         }
     }
 
-    /** Configura Ações de Impressão de Recibo do Cliente **/
+    /**
+     * Configura Ações de Impressão de Recibo do Cliente. Guarda as três flags (askReceipt, smsReceipt,
+     * directReceipt; flag ausente no argumento fica `false`) e registra o [printListener] no Wrapper.
+     * Ver a prioridade entre as flags em [printListener].
+     **/
     fun setPrintActionListener(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (setPrintActionListener)", plugPag.hashCode().toString())
 
@@ -419,7 +435,12 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
         }
     }
 
-    /** Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona **/
+    /**
+     * Define Estilo Visual (Cores e Texto) do Recibo do Cliente de forma Síncrona.
+     * Cores chegam como inteiro ARGB ou texto HEX (ver [Util.callHex]).
+     * `maxTimeShowPopup` = tempo máximo, em segundos, que o popup do recibo (perguntar / SMS / imprimir) fica na tela.
+     * Sem valor no argumento assume 20, o mesmo padrão do Dart (setPlugPagCustomPrinterLayout).
+     **/
     fun setPlugPagCustomPrinterLayout(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (setPlugPagCustomPrinterLayout)", plugPag.hashCode().toString())
 
@@ -432,7 +453,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
             buttonBackgroundColor = Util.callHex(call, "buttonBackgroundColor"),
             buttonBackgroundColorDisabled = Util.callHex(call, "buttonBackgroundColorDisabled"),
             sendSMSTextColor = Util.callHex(call, "sendSMSTextColor"),
-            maxTimeShowPopup = Util.callInt(call, "maxTimeShowPopup", 30)
+            maxTimeShowPopup = Util.callInt(call, "maxTimeShowPopup", 20)
         )
 
         CoroutineHelper.launchIO(scope) {
@@ -449,7 +470,7 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                         )
                     )
                 }
-            } catch (e: PlugPagException) {
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     logger.error("setPlugPagCustomPrinterLayout (PlugPagException)", "Erro ao Configurar Estilo de Recibo do Cliente: ${e.message}")
                     result.success(

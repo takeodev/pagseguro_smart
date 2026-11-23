@@ -14,17 +14,20 @@ import kotlinx.coroutines.launch
 
 /** Helpers para execução de corrotinas no plugin **/
 object CoroutineHelper {
-    /** Executa código no Main Thread **/
+    /**
+     * Executa código no Main Thread. Usado para responder ao Flutter (`MethodChannel.Result`),
+     * que deve ser chamado na Main Thread; chamar fora dela causa erro no canal.
+     **/
     fun launchMain(scope: CoroutineScope, block: suspend CoroutineScope.() -> Unit) {
         scope.launch(Dispatchers.Main, block = block)
     }
 
-    /** Executa código em Background **/
+    /** Executa código em Background (CPU leve/cálculos, sem bloqueio de I/O) **/
     fun launchDefault(scope: CoroutineScope, block: suspend CoroutineScope.() -> Unit) {
         scope.launch(Dispatchers.Default, block = block)
     }
 
-    /** Executa código em Thread de I/O (operações bloqueantes, PESADAS (I/O, BD, cálculo, logs grandes) **/
+    /** Executa código em Thread de I/O (operações bloqueantes e PESADAS: I/O, BD, cálculo, logs grandes) **/
     fun launchIO(scope: CoroutineScope, block: suspend CoroutineScope.() -> Unit) {
         scope.launch(Dispatchers.IO, block = block)
     }

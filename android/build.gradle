@@ -2,15 +2,15 @@ group = "com.takeodev.pagseguro_smart"
 version = "1.0-SNAPSHOT"
 
 buildscript {
-    ext.kotlin_version = "2.1.0"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:8.9.1")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+        // A versão do AGP declarada pelo App sempre tem prioridade sobre esta. Mantida na série 8.x (acima do mínimo do
+        // Flutter, 8.11.1) de propósito: uma 9.x exigiria Gradle 9 e poderia quebrar Apps que ainda usam Gradle 8.14.
+        classpath("com.android.tools.build:gradle:8.13.0")
     }
 }
 
@@ -25,7 +25,15 @@ rootProject.allprojects {
 }
 
 apply plugin: "com.android.library"
-apply plugin: "kotlin-android"
+
+// Built-in Kotlin (AGP 9+): o AGP compila Kotlin sem o Kotlin Gradle Plugin (KGP).
+// Compatibilidade: em Apps com AGP < 9 ou com "android.builtInKotlin=false", o KGP é aplicado aqui.
+def agpMajorVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize(".")[0].toInteger()
+def builtInKotlinProperty = project.findProperty("android.builtInKotlin")
+def isBuiltInKotlin = agpMajorVersion >= 9 && (builtInKotlinProperty == null || builtInKotlinProperty.toString().toBoolean())
+if (!isBuiltInKotlin) {
+    project.pluginManager.apply("org.jetbrains.kotlin.android")
+}
 
 android {
     namespace = "com.takeodev.pagseguro_smart"
@@ -36,10 +44,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11
-    }
-
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
@@ -47,11 +51,6 @@ android {
 
     defaultConfig {
         minSdk = 23
-    }
-
-    dependencies {
-        testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.0.0")
     }
 
     testOptions {
@@ -67,7 +66,15 @@ android {
     }
 }
 
-dependencies{
+// JVM Target do Kotlin: "compilerOptions" (Built-in Kotlin ou KGP 2.0+), senão "kotlinOptions" (KGP 1.x).
+def kotlinExtension = project.extensions.findByName("kotlin")
+if (kotlinExtension != null && kotlinExtension.hasProperty("compilerOptions")) {
+    kotlinExtension.compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
+} else if (android.hasProperty("kotlinOptions")) {
+    android.kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+}
+
+dependencies {
     // https://github.com/pagseguro/pagseguro-sdk-plugpagservicewrapper/tree/master/br/com/uol/pagseguro/plugpagservice/wrapper/wrapper
     // https://pagseguro.github.io/pagseguro-sdk-plugpagservicewrapper/index.html
     implementation 'br.com.uol.pagseguro.plugpagservice.wrapper:wrapper:1.35.0'
@@ -79,4 +86,7 @@ dependencies{
     implementation 'com.hannesdorfmann.mosby:mvp:2.0.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'com.google.code.gson:gson:2.10.1'
+
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.mockito:mockito-core:5.0.0")
 }

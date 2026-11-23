@@ -37,6 +37,7 @@ object Util {
         val value = call.argument<Any>(key) ?: return null
 
         return when (value) {
+            // Int/Long vindo do Dart já é ARGB: só formata (não força opacidade, diferente do texto abaixo)
             is Int -> String.format("#%08X", value)
             is Long -> String.format("#%08X", value.toInt())
             is String -> {

@@ -18,14 +18,17 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagIsActivatedL
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagInitializationResult
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagUserDataResult
-import br.com.uol.pagseguro.plugpagservice.wrapper.exception.PlugPagException
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagStyleData
 import br.com.uol.pagseguro.plugpagservice.wrapper.listeners.PlugPagSetStylesListener
 import com.takeodev.pagseguro_smart.utils.Util
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
 
-/** Gerencia a ativação do PinPad **/
+/**
+ * Gerencia o PinPad: autenticação/ativação, dados do dono e número de série da maquininha,
+ * reinicialização, status do serviço PagSeguro e cores das janelas (estilo).
+ * Métodos "async" usam listeners do Wrapper; os demais respondem com o resultado final.
+ **/
 class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineScope) {
 
     companion object {
@@ -36,7 +39,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
     /** Logger personalizado com TAG para identificar a Origem **/
     private val logger = Logger(TAG)
 
-    /** Verifica se PinPad foi Autenticado de forma Assíncrona **/
+    /** Verifica se PinPad foi Autenticado de forma Síncrona (a chamada roda em thread de IO) **/
     fun isAuthenticated(result: MethodChannel.Result) {
         logger.info("PlugPag Instance (isAuthenticated)", plugPag.hashCode().toString())
 
@@ -113,7 +116,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                             logger.error("asyncIsAuthenticated (onError)", "Erro na Autenticação: $errorMessage")
                             result.success(mapOf(
                                 "success" to false,
-                                "message" to "$errorMessage",
+                                "message" to errorMessage,
                                 "data" to null
                             ))
                             plugPag.disposeSubscriber()
@@ -134,7 +137,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
         }
     }
 
-    /** Inicializa e ativa o PinPad de forma Síncrona **/
+    /**
+     * Inicializa e ativa o PinPad de forma Síncrona. O código de ativação vazio é recusado antes de
+     * chamar o Wrapper. A chamada bloqueante roda em thread de IO.
+     **/
     fun initPinPad(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (initPinPad)", plugPag.hashCode().toString())
 
@@ -218,10 +224,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                 activationData,
                 object : PlugPagActivationListener {
                     override fun onActivationProgress(eventData: PlugPagEventData) {
+                        // IMPORTANTE: não chamar disposeSubscriber() aqui, ele cancelaria a ativação em andamento.
                         CoroutineHelper.launchMain(scope) {
                             logger.info("asyncInitPinPad (onActivationProgress)", "Ativando PinPad | Id: ${eventData.eventCode} | ${eventData.customMessage}")
-                            plugPag.disposeSubscriber()
-                        }
+                            }
                     }
 
                     override fun onSuccess(initializationResult: PlugPagInitializationResult) {
@@ -262,7 +268,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
         }
     }
 
-    /** Coleta Dados do Usuário (Dono da Maquininha) **/
+    /**
+     * Coleta Dados do Usuário (Dono da Maquininha). Atenção LGPD: dados pessoais, não logar o conteúdo.
+     * Qualquer erro do Wrapper vira `success: false` (o `null` do Wrapper também).
+     **/
     fun getUserData(result: MethodChannel.Result) {
         logger.info("PlugPag Instance (getUserData)", plugPag.hashCode().toString())
 
@@ -378,7 +387,8 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                         )
                     )
                 }
-            } catch (e: PlugPagException) {
+            // Captura Exception (e não só PlugPagException) para nunca derrubar o App
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     logger.error("rebootDevice (PlugPagException)", "Erro ao Reiniciar Maquininha: ${e.message}")
                     result.success(
@@ -393,7 +403,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
         }
     }
 
-    /** Verifica se o Serviço da PagSeguro está Livre **/
+    /**
+     * Verifica se o Serviço da PagSeguro está Livre. Importante: `success` indica apenas que a consulta
+     * funcionou; o estado está em `data` (`true` = ocupado, `false` = livre).
+     **/
     fun isServiceBusy(result: MethodChannel.Result) {
         logger.info("PlugPag Instance (isServiceBusy)", plugPag.hashCode().toString())
 
@@ -413,7 +426,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                         )
                     )
                 }
-            } catch (e: PlugPagException) {
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     result.success(
                         mapOf(
@@ -427,7 +440,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
         }
     }
 
-    /** Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona **/
+    /**
+     * Define Estilo Visual (Cores) de Janelas PagSeguro de forma Síncrona.
+     * Cada cor é lida como ARGB (ver [Util.callColorInt]); cor ausente ou inválida fica `null`.
+     **/
     fun setStyleData(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (setStyleData)", plugPag.hashCode().toString())
 
@@ -473,7 +489,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                         )
                     }
                 }
-            } catch (e: PlugPagException) {
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     logger.error("setStyleData (PlugPagException)", "Erro ao Configurar Estilo de Janelas: ${e.message}")
                     result.success(mapOf(
@@ -553,7 +569,7 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
                         }
                     }
                 )
-            } catch (e: PlugPagException) {
+            } catch (e: Exception) {
                 CoroutineHelper.launchMain(scope) {
                     logger.error("asyncSetStyles (PlugPagException)", "Erro ao Configurar Estilo de Janelas: ${e.message}")
                     result.success(
@@ -570,7 +586,10 @@ class PinPadManager(private val plugPag: PlugPag, private val scope: CoroutineSc
     }
 }
 
-/** Extensão para converter PlugPagUserDataResult em Map<String, Any?> para envio ao Flutter **/
+/**
+ * Extensão para converter PlugPagUserDataResult em Map<String, Any?> para envio ao Flutter.
+ * Atenção LGPD: e-mail, CNPJ/CPF e endereço são dados pessoais.
+ **/
 fun PlugPagUserDataResult.toMap(): Map<String, Any?> {
     return mapOf(
         "userNickName" to userNickName,
