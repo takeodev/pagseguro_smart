@@ -1,0 +1,6 @@
+# Dart / Flutter (gerados automaticamente)
+.dart_tool/
+build/
+
+# IDE: cache local do Android Studio (muda a cada uso)
+.idea/caches/
