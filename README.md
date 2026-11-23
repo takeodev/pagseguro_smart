@@ -37,15 +37,23 @@ Permite pagamentos, estornos, callbacks de transação, reimpressão de recibos 
     - [Verificando se PinPad está Autenticado](#4-2-1-verificando-pinpad)
     - [Ativando o PinPad](#4-2-2-ativando-pinpad)
     - [Layout de Janelas PagSeguro](#4-2-3-layout)
+    - [Desativando, Invalidando e Ativação PagBank](#4-2-4-desativando-pinpad)
   - [Pagamentos](#4-3-pagamentos)
   - [Estorno](#4-4-estorno)
   - [Impressão & Recibos](#4-5-impressao-recibos)
+    - [Imprimindo Imagem de Arquivo](#4-5-1-print-from-file)
   - [Callbacks](#4-6-callbacks)
+  - [Dispositivo](#4-7-dispositivo)
+  - [Parcelamento (Cálculo)](#4-8-parcelamento-calculo)
+  - [Subadquirente](#4-9-subadquirente)
+  - [Deeplink de Venda](#4-10-deeplink)
+  - [App Example](#4-11-app-example)
 - [Identificações PagSeguro](#5-identificacao)
   - [Tipos de Pagamento](#5-1-tipos-de-pagamento)
   - [Parcelamento](#5-2-parcelamento)
   - [Estorno](#5-3-estorno)
   - [Como Utilizar o "PagSeguroEnum"](#5-4-utilizar-enum)
+  - [Cores de LED (PagSeguroLed)](#5-5-pagseguro-led)
 - [Models](#6-models)
 - [Notas Importantes](#7-notas-importantes)
 - [Desenvolvedor](#8-desenvolvedor)
@@ -67,7 +75,7 @@ No `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  pagseguro_smart: ^1.3.3
+  pagseguro_smart: ^1.4.0
 ```
 
 Execute:
@@ -241,7 +249,7 @@ Future<void> initPinPad(String codigoAtivacao) async {
 Necessário atenção para evitar crashes como _**IllegalArgumentException: Unknown color**_.
 
 ```dart
-final LayoutPreset preset = LayoutPreset.darkBlue;
+final LayoutPreset layoutPreset = LayoutPreset.darkBlue;
 final style = LayoutPresets.of(layoutPreset);
 
 final result = await pagSeguro.setStyleData(
@@ -262,6 +270,26 @@ final result = await pagSeguro.setStyleData(
 );
 ```
 
+### <span id="4-2-4-desativando-pinpad"></span> Desativando, Invalidando e Ativação PagBank
+
+- `deactivate(activationCode)` / `asyncDeactivate(activationCode)`: desativa o PinPad (use o mesmo código da ativação). A versão `async` responde pelo callback de resultado final.
+- `invalidateAuthentication()`: invalida a autenticação atual; será necessário ativar o PinPad novamente.
+- `initPagBankActivation()`: inicia a ativação pelo fluxo PagBank do PlugPagService.
+
+```dart
+Future<void> desativarPinPad(String codigoAtivacao) async {
+  final result = await pagSeguro.deactivate(codigoAtivacao); // Ex.: '12345678' (código fictício)
+
+  if (result['success']) {
+    print('${result['message']}'); // "PinPad Desativado com Sucesso!"
+  } else {
+    print('Falha: ${result['message']}');
+  }
+}
+```
+
+Retorno: `{success, message, data}`. Em caso de sucesso, `message` descreve a operação. Em falha, `message` traz o motivo.
+
 ---
 
 ## <span id="4-3-pagamentos"></span> 💳 Pagamentos
@@ -276,7 +304,7 @@ final result = await pagSeguro.doPayment(
 );
 
 if (result['success']) {
-  final transaction = TransactionModel.fromJsonToModel(result['data']);
+  final transaction = TransactionDataModel.fromMap(result['data']);
   print('Pagamento aprovado!');
 } else {
   print('Falha: ${result['message']}');
@@ -341,6 +369,26 @@ await pagSeguro.sendReceiptSMS(
 );
 ```
 
+### <span id="4-5-1-print-from-file"></span> Imprimindo Imagem de Arquivo
+
+`printFromFile` imprime uma imagem (ex.: PNG) a partir de um **caminho absoluto** no dispositivo. Largura ideal da imagem: **384 px**.
+
+```dart
+final result = await pagSeguro.printFromFile(
+  filePath: '/storage/emulated/0/Download/cupom.png', // Caminho absoluto (exemplo)
+  printerQuality: 4, // De 1 a 4 (padrão 4)
+  steps: 70, // Avanço de papel após a impressão (padrão 70)
+);
+
+if (result['success']) {
+  print('${result['message']}'); // "Arquivo Impresso!"
+} else {
+  print('Falha: ${result['message']}');
+}
+```
+
+Retorno: `{success, message, data}`, em que `data` contém `result` e `steps` do Wrapper. Se o arquivo não existir, retorna falha com a mensagem "Arquivo para Impressão não Encontrado!".
+
 ---
 
 ## <span id="4-6-callbacks"></span> 📡 Callbacks
@@ -361,6 +409,178 @@ void initState() {
   };
 }
 ```
+
+---
+
+## <span id="4-7-dispositivo"></span> 🖲️ Dispositivo
+
+Recursos de informação e de interação com a maquininha (versão 1.4.0).
+
+### Modelo, Capacidades e Permissão
+
+```dart
+final modelo = await pagSeguro.getModel();
+if (modelo['success']) print('Modelo: ${modelo['data']}'); // String, ex.: "GPOS780"
+
+final temCapacidade = await pagSeguro.hasCapability(capacidade); // int: constante "PlugPag" do Wrapper
+final temSoftware = await pagSeguro.hasSoftwareCapability(capacidade, mode: modo); // mode é opcional
+
+final permissao = await pagSeguro.checkPermission();
+```
+
+- `getModel()`: retorno `data` é um texto com o modelo da maquininha.
+- `hasCapability(int capability)` e `hasSoftwareCapability(int capability, {int? mode})`: retorno `data` é `bool`. Os valores de `capability` e `mode` são as constantes do Wrapper PagSeguro.
+- `checkPermission()`: verifica se o App tem permissão para usar o PlugPagService. Retorno `data` é `bool`. Tem **tempo limite de 10s**, pois algumas maquininhas não respondem; nesse caso, a chamada retorna falha por tempo esgotado.
+
+### Beep e LED
+
+```dart
+await pagSeguro.beep(frequency: 3, duration: 200); // frequency de 0 a 6; duration em milissegundos
+await pagSeguro.setLed(PagSeguroLed.green); // ver "Cores de LED (PagSeguroLed)"
+```
+
+- `beep({frequency = 3, duration = 200})` e `setLed(PagSeguroLed led)`: têm **tempo limite de 20s**.
+- Na GPOS780S, o TerminalLib retorna `1` em caso de sucesso, e o plugin trata esse valor como sucesso.
+
+### Atualização Remota e OnBoarding
+
+```dart
+final atualizacao = await pagSeguro.updateRemoteConfig();
+if (!atualizacao['success']) print('Falha: ${atualizacao['message']}');
+
+await pagSeguro.startOnBoarding(); // Abre o fluxo de primeiro acesso do PlugPagService
+```
+
+- `updateRemoteConfig()`: atualiza as configurações remotas do PlugPagService. Em alguns equipamentos, retorna o código `-1033`, que aparece na `message` de falha.
+  Trate essa falha e informe o usuário para tentar novamente.
+- `startOnBoarding()`: abre o fluxo de OnBoarding (primeiro acesso).
+
+### Leitura de Dados do Cartão
+
+```dart
+final cartao = await pagSeguro.getCardData(); // Exige um cartão apresentado na maquininha
+if (cartao['success']) {
+  final dados = cartao['data']; // {result, message, bin, holder, cardHolder}
+}
+```
+
+> ⚠️ **LGPD** — `getCardData()` retorna dados do portador. Não registre esses dados em logs, telas ou servidores sem base legal e finalidade definidas.
+
+### Retorno dos Métodos de Dispositivo
+
+Todos retornam `{success, message, data}`. O campo `data` depende do método, conforme descrito acima.
+
+---
+
+## <span id="4-8-parcelamento-calculo"></span> 🧮 Parcelamento (Cálculo)
+
+Calcula as parcelas de um valor (em Reais) sem iniciar uma venda.
+
+### Sem tipo de parcelamento
+
+```dart
+final result = await pagSeguro.calculateInstallments(value: 100.00);
+
+if (result['success']) {
+  final List<String> parcelas = (result['data'] as List).cast<String>();
+  // Posição 1 = 1x. Valores em centavos como texto.
+  // Ex.: ["10000", "5848"] => 1x R$ 100,00 e 2x R$ 58,48
+}
+```
+
+### Com tipo de parcelamento
+
+```dart
+final result = await pagSeguro.calculateInstallments(
+  value: 100.00,
+  installmentType: PagSeguroEnum.iForMerchant, // ou PagSeguroEnum.iForCustomer
+);
+
+if (result['success']) {
+  final parcelas = InstallmentModel.fromList(result['data']);
+  for (final p in parcelas) {
+    print('${p.quantity}x de R\$ ${p.amountValue.toStringAsFixed(2)} (total R\$ ${p.totalValue.toStringAsFixed(2)})');
+  }
+}
+```
+
+- Sem `installmentType`: `data` é uma lista de **textos** com o valor de cada parcela em **centavos**, começando na posição 1 (1x).
+- Com `installmentType`: `data` é uma lista de mapas `{quantity, amount, total}` em **centavos**, começando no 2x. Use `InstallmentModel.fromList()` para converter (ver [Models](#6-models)).
+
+### Versão assíncrona
+
+```dart
+final result = await pagSeguro.asyncCalculateInstallments(value: 100.00);
+```
+
+- `asyncCalculateInstallments(value)` recebe apenas o valor. O resultado chega pelo callback do Wrapper e pode vir como lista de textos (centavos) ou de mapas `{quantity, amount, total}`, conforme o callback recebido.
+
+Retorno: `{success, message, data}`. Em falha (valor inválido, por exemplo), `success` é `false`.
+
+---
+
+## <span id="4-9-subadquirente"></span> 🏦 Subadquirente
+
+Configura um Subadquirente (facilitador de pagamento) na maquininha.
+
+```dart
+final temSub = await pagSeguro.hasSubAcquirer(); // data: bool
+
+final result = await pagSeguro.initializeSubAcquirer(
+  name: 'Loja Exemplo',
+  address: 'Rua Exemplo, 100',
+  city: 'Cidade Exemplo',
+  uf: 'SP',
+  country: 'BRA',
+  zipCode: '00000000',
+  mcc: '5411',
+  cnpjCpf: '00000000000000', // Dados fictícios
+  docType: 'CNPJ', // Confira os valores aceitos pelo Wrapper
+  telephone: '11900000000',
+  fullName: 'Responsavel Exemplo',
+  merchantId: '000000',
+);
+
+final dados = await pagSeguro.getSubAcquirerData(); // data: Map com os dados do Subadquirente
+await pagSeguro.invalidateSubAcquirer(); // Remove o Subadquirente configurado
+```
+
+- `hasSubAcquirer()`: retorno `data` é `bool`.
+- `getSubAcquirerData()`: retorna falha "Sem Subadquirente Configurado!" quando não há Subadquirente.
+- `initializeSubAcquirer(...)`: todos os campos são texto e devem respeitar os limites de tamanho do Wrapper.
+- `invalidateSubAcquirer()`: remove o Subadquirente configurado.
+
+> ⚠️ **LGPD** — os dados do Subadquirente incluem CPF/CNPJ, nome e telefone de pessoas físicas ou jurídicas. Use dados reais apenas no ambiente de produção, não os exiba em logs e não os envie a terceiros sem necessidade. Os exemplos acima são fictícios.
+
+---
+
+## <span id="4-10-deeplink"></span> 🔗 Deeplink de Venda
+
+Registra um deeplink que o PlugPagService abre ao iniciar uma venda.
+
+```dart
+final result = await pagSeguro.setSellDeeplink('meuapp://venda'); // Link de exemplo
+if (!result['success']) print('Falha: ${result['message']}');
+
+await pagSeguro.removeSellDeeplink(); // Remove o deeplink de venda
+```
+
+- `setSellDeeplink(String deeplink)`: retorna `{success, message, data}`. Falha se o link estiver vazio.
+- `removeSellDeeplink()`: retorna `{success, message, data}`.
+
+---
+
+## <span id="4-11-app-example"></span> 📱 App Example
+
+O projeto `example/` demonstra o plugin em um app com três abas:
+
+- **Pagamento**: pagamentos, estornos e demais operações de venda.
+- **Comandos**: chamadas diretas aos métodos do plugin, com a opção **Modo Assíncrono** para testar os métodos assíncronos.
+- **Recursos**: Dispositivo, Parcelamento, Impressão de Cupom, Leitura de Cartão e Subadquirente.
+
+Para conhecer o app, toque no botão flutuante **Tour guiado** (canto inferior direito): o tour destaca cada bloco e botão das três abas e explica o que cada um faz.
+
+Detalhes das versões do app: [example/CHANGELOG.md](example/CHANGELOG.md).
 
 ---
 
@@ -391,6 +611,18 @@ print('Código: ${pagSeguroEnum.code}'); // Enviar para a PagSeguro sempre o Có
 print('Descrição: ${pagSeguroEnum.description}'); // Utilizar para Tratativas Internas como preferir
 ```
 
+### <span id="5-5-pagseguro-led"></span> Cores de LED (PagSeguroLed)
+
+Usado em `setLed(PagSeguroLed led)`:
+
+- `PagSeguroLed.off` (desliga)
+- `PagSeguroLed.red`
+- `PagSeguroLed.green`
+- `PagSeguroLed.yellow`
+- `PagSeguroLed.blue`
+
+Use `led.code` para o valor enviado ao Wrapper (0, 1, 2, 4 ou 8).
+
 ---
 
 ## <span id="6-models"></span> 📄 Models
@@ -398,9 +630,23 @@ print('Descrição: ${pagSeguroEnum.description}'); // Utilizar para Tratativas 
 Inclui:
 
 - `UserDataModel`
-- `TransactionModel`
+- `TransactionDataModel`
+- `InstallmentModel` (parcela calculada com `installmentType`, ver [Parcelamento (Cálculo)](#4-8-parcelamento-calculo))
 
-Todos com `fromJsonToModel()` para parse automático.
+`UserDataModel` e `TransactionDataModel` são criados com `fromMap()` a partir do `data` retornado pelo plugin.
+
+```dart
+final parcelas = InstallmentModel.fromList(result['data']); // Lista de InstallmentModel
+final valorParcela = parcelas.first.amountValue; // Em Reais (amount vem em centavos)
+```
+
+| Campo | Tipo | Descrição |
+| --- | --- | --- |
+| `quantity` | `int` | Quantidade de parcelas |
+| `amount` | `int` | Valor de cada parcela, em centavos |
+| `total` | `int` | Valor total, em centavos |
+| `amountValue` | `double` | `amount` em Reais |
+| `totalValue` | `double` | `total` em Reais |
 
 ---
 
@@ -410,6 +656,12 @@ Todos com `fromJsonToModel()` para parse automático.
 - A maquininha deve estar vinculada a um **usuário ativo** na PagSeguro e com o aplicativo configurado (salvo maquininha debug).
 - Callbacks dependem do texto da maquininha — o comportamento pode variar por modelo.
 - Recomenda-se testar em dispositivo físico real.
+- Alguns métodos da versão 1.4.0 têm **tempo limite**: `checkPermission` (10s), `beep` e `setLed` (20s). Em maquininhas que não respondem, a chamada retorna falha por tempo esgotado.
+- Dados pessoais (`getCardData`, `getSubAcquirerData`, `initializeSubAcquirer`) são sensíveis à LGPD: não registre em logs e use apenas o necessário.
+- **Logs:** o plugin registra no Logcat o andamento das operações (nunca dados pessoais). Em produção, desligue com `await pagSeguro.setLogEnabled(false);` (erros continuam registrados).
+- **Logs do Wrapper (LGPD):** o próprio Wrapper da PagSeguro registra no Logcat os dados da transação (ex.: BIN, final do cartão e `cardHash`). Isso não é controlado pelo plugin: não colete nem compartilhe o Logcat de maquininhas em produção.
+- **Resultado tipado (opcional):** todos os métodos continuam devolvendo `Map`; para ler de forma tipada use `final r = (await pagSeguro.getModel()).toPagSeguroResult();` e então `r.success`, `r.message` e `r.data`.
+- **`Constants` agora é `PagSeguroConstants`:** o nome antigo continua funcionando, mas está obsoleto e será removido na 2.0.
 
 ---
 
@@ -422,6 +674,14 @@ Todos com `fromJsonToModel()` para parse automático.
   <br>
   <b>Fernando Takeo Miyaji</b>
 </p>
+
+Este pacote é **gratuito e de código aberto**, mantido por [Takeo](https://www.takeodev.com/) sem fins lucrativos. Se ele te ajudou:
+
+- ⭐ Dê uma estrela no [GitHub](https://github.com/takeodev/pagseguro_smart) e um "like" no [pub.dev](https://pub.dev/packages/pagseguro_smart).
+- 💬 Mantenha os créditos do desenvolvedor ao reutilizar ou divulgar o projeto.
+- 🧪 Abra uma issue com dúvidas, sugestões ou erros encontrados.
+
+> Projeto independente: não é um produto oficial da PagSeguro/PagBank.
 
 ---
 
