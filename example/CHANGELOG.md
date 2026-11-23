@@ -1,6 +1,6 @@
 # Changelog PagSeguro Smart Example (by Takeo)
 
-## 1.1.1 (em desenvolvimento)
+## 1.1.1
 
 - [Add] Nova aba "_Recursos_" com Dispositivo, Parcelamento, Impressão de Cupom, Leitura de Cartão e Subadquirente.
 - [Add] Opção "_Modo Assíncrono_" na aba "Comandos" para testar os métodos assíncronos (autenticação, ativação, pagamento, cancelamento, estorno e última transação).

@@ -1,6 +1,6 @@
 # Changelog PagSeguro Smart (by Takeo)
 
-## 1.4.0 (em desenvolvimento)
+## 1.4.0
 
 - [Add] Dispositivo: "**beep**", "**setLed**" (enum "_PagSeguroLed_"), "**updateRemoteConfig**", "**startOnBoarding**" e "**getCardData**".
 - [Add] Dispositivo: "**getModel**", "**hasCapability**", "**hasSoftwareCapability**", "**checkPermission**" (com tempo limite de 10s).
