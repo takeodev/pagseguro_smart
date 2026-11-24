@@ -325,6 +325,8 @@ final estorno = await pagSeguro.voidPayment(
 );
 ```
 
+> ℹ️ **Desde a 1.4.1**, a ação de recibo configurada em `setPrintActionListener` (perguntar, SMS, imprimir ou dispensar) também é entregue no estorno. Antes, o Wrapper PagSeguro 1.35.0 perdia essa ação no estorno e o resultado só chegava após ~120 s, com _**PP1064 - Tempo limite expirado**_. A correção é feita pelo plugin; nada muda no uso.
+
 ---
 
 ## <span id="4-5-impressao-recibos"></span> 🧾 Impressão & Recibos
@@ -409,6 +411,28 @@ void initState() {
   };
 }
 ```
+
+**Eventos de pagamento (1.4.1):** o callback opcional `onPaymentEvent` é chamado logo depois de `onPaymentProgress`, com a assinatura `void Function(int eventCode, String message, bool canAbort)`. O `eventCode` é o código do Wrapper (`PlugPagEventData`), ou `-1` quando não informado.
+
+```dart
+pagSeguro.onPaymentEvent = (eventCode, message, canAbort) {
+  if (eventCode == PagSeguroConstants.eventSaleApproved) {
+    // transação autorizada: aguardar o resultado final
+  }
+};
+```
+
+Constantes principais em `PagSeguroConstants`:
+
+- `eventWaitingCard = 0`: aguardando cartão.
+- `eventSaleEnd = 4`: finalizado.
+- `eventAuthorizing = 5`: autorizando.
+- `eventDigitPassword = 16`: digitação de senha.
+- `eventSaleApproved = 18`: transação autorizada.
+- `eventSaleNotApproved = 19`: transação não aprovada.
+- `eventDefault = -1`: código não informado.
+
+> 💡 Prefira agir pelo **código** do evento (`eventCode`), e não pelo texto da mensagem, que pode variar por modelo de maquininha.
 
 ---
 
@@ -657,6 +681,7 @@ final valorParcela = parcelas.first.amountValue; // Em Reais (amount vem em cent
 - Callbacks dependem do texto da maquininha — o comportamento pode variar por modelo.
 - Recomenda-se testar em dispositivo físico real.
 - Alguns métodos da versão 1.4.0 têm **tempo limite**: `checkPermission` (10s), `beep` e `setLed` (20s). Em maquininhas que não respondem, a chamada retorna falha por tempo esgotado.
+- **Tempo limite opcional (1.4.1):** `isAuthenticated`, `asyncIsAuthenticated`, `getUserData`, `getSerialNumber`, `isServiceBusy`, `getLastTransaction` e `asyncGetLastTransaction` aceitam `timeout: Duration`. Sem ele nada muda. Com ele, se o serviço PagBank travar (visto após muitas horas ligado; reiniciar a maquininha resolve), o retorno é `{success: false, message: PagSeguroService.timeoutMessage}` em vez de esperar para sempre. Exemplo: `final user = await pagSeguro.getUserData(timeout: const Duration(seconds: 15));`. Pagamento e estorno não têm timeout de propósito: cortar a espera poderia esconder uma transação aprovada.
 - Dados pessoais (`getCardData`, `getSubAcquirerData`, `initializeSubAcquirer`) são sensíveis à LGPD: não registre em logs e use apenas o necessário.
 - **Logs:** o plugin registra no Logcat o andamento das operações (nunca dados pessoais). Em produção, desligue com `await pagSeguro.setLogEnabled(false);` (erros continuam registrados).
 - **Logs do Wrapper (LGPD):** o próprio Wrapper da PagSeguro registra no Logcat os dados da transação (ex.: BIN, final do cartão e `cardHash`). Isso não é controlado pelo plugin: não colete nem compartilhe o Logcat de maquininhas em produção.

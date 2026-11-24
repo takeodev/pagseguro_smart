@@ -7,6 +7,27 @@ class PagSeguroConstants {
   static const List<String> denyWords = ['retire', 'tempo', 'permitida', 'atualizando', 'selecionado', 'senha'];
   static const List<String> allowPhrases = ['servico ocupado', 'nao tente novamente'];
   static const List<String> denyPhrases = ['transação autorizada', 'transação não autorizada', 'operacao cancelada', 'operacao nao'];
+
+  /// Códigos dos eventos de progresso recebidos em `onPaymentEvent` (iguais a PlugPagEventData.EVENT_CODE_*) - 1.4.1
+  static const int eventCustomMessage = -2; // EVENT_CODE_CUSTOM_MESSAGE (mensagem livre da maquininha)
+  static const int eventDefault = -1; // EVENT_CODE_DEFAULT (código não informado)
+  static const int eventWaitingCard = 0; // EVENT_CODE_WAITING_CARD
+  static const int eventInsertedCard = 1; // EVENT_CODE_INSERTED_CARD
+  static const int eventPinRequested = 2; // EVENT_CODE_PIN_REQUESTED
+  static const int eventPinOk = 3; // EVENT_CODE_PIN_OK
+  static const int eventSaleEnd = 4; // EVENT_CODE_SALE_END (pagamento/estorno finalizado)
+  static const int eventAuthorizing = 5; // EVENT_CODE_AUTHORIZING
+  static const int eventWaitingRemoveCard = 7; // EVENT_CODE_WAITING_REMOVE_CARD
+  static const int eventRemovedCard = 8; // EVENT_CODE_REMOVED_CARD
+  static const int eventDigitPassword = 16; // EVENT_CODE_DIGIT_PASSWORD
+  static const int eventNoPassword = 17; // EVENT_CODE_NO_PASSWORD
+  static const int eventSaleApproved = 18; // EVENT_CODE_SALE_APPROVED (transação autorizada)
+  static const int eventSaleNotApproved = 19; // EVENT_CODE_SALE_NOT_APPROVED
+  static const int eventQrCode = 20; // EVENT_CODE_QRCODE
+  static const int eventContactlessError = 23; // EVENT_CODE_CONTACTLESS_ERROR
+  static const int eventUseChip = 26; // EVENT_CODE_USE_CHIP
+  static const int eventSuccess = 29; // EVENT_CODE_SUCCESS
+  static const int eventSolvePendings = 30; // EVENT_CODE_SOLVE_PENDINGS
 }
 
 /// Nome antigo de [PagSeguroConstants], mantido só para não quebrar quem já usa o pacote.

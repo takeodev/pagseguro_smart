@@ -9,7 +9,7 @@ topics:
   - payment
   - pos
   - android
-version: 1.4.0
+version: 1.4.1
 
 environment:
   # Mínimo real: Color.toARGB32() (usado em setStyleData) existe a partir do Flutter 3.27 / Dart 3.6

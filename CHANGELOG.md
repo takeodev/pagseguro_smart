@@ -1,5 +1,18 @@
 # Changelog PagSeguro Smart (by Takeo)
 
+## 1.4.1
+
+- [Fix] "**voidPayment**" e "**asyncVoidPayment**": ação de recibo chega ao serviço; estorno em segundos (antes ~120 s, "_PP1064_").
+- [Fix] "**voidPayment**" e "**asyncVoidPayment**": "**setPrintActionListener**" reaplicado antes do estorno (evita popup padrão de ~15 s).
+- [Fix] "**voidPayment**": "_onPaymentProgress_" enviado ao Flutter mesmo sem venda anterior.
+- [Add] Callback "**onPaymentEvent**" com "_eventCode_" numérico, mensagem e "_canAbort_".
+- [Add] Códigos de evento em "**PagSeguroConstants**" ("_eventSaleApproved_" = 18, "_eventSaleEnd_" = 4, ...).
+- [Add] Parâmetro opcional "_timeout_" nas consultas "**isAuthenticated**", "**getUserData**", "**getSerialNumber**", "**isServiceBusy**".
+- [Add] Parâmetro opcional "_timeout_" em "**getLastTransaction**" e nas versões assíncronas ("_tempo esgotado_" se o serviço travar).
+- [Add] Regras R8 para build release: "**consumer-rules.pro**" no plugin ("_-dontwarn_" do "_Parcelize_" e "_keep_" do Wrapper).
+- [Improve] Log de diagnóstico no "**onPrint**" do recibo (sem dados pessoais).
+- [Improve] Testes unitários de "**onPaymentEvent**" e do "_timeout_".
+
 ## 1.4.0
 
 - [Add] Dispositivo: "**beep**", "**setLed**" (enum "_PagSeguroLed_"), "**updateRemoteConfig**", "**startOnBoarding**" e "**getCardData**".
@@ -9,34 +22,39 @@
 - [Add] Impressão: "**printFromFile**" (imprime imagem a partir de arquivo).
 - [Add] Subadquirente: "**hasSubAcquirer**", "**getSubAcquirerData**", "**initializeSubAcquirer**" e "**invalidateSubAcquirer**".
 - [Add] Deeplink de Venda: "**setSellDeeplink**" e "**removeSellDeeplink**".
-- [Improve] Utilitário "_ResultHelper_" no Android: chamadas novas responde ao Flutter e registra no log apenas sucesso/mensagem (nunca dados pessoais).
-- [Fix] Em "**PagSeguroEnum**", códigos de "_tPreAuthCard_" (7 => 6), "_tQrCodeCredit_" (8 => 7) e "_tPreAuthKeyed_" (9 => 8) para conferir com o Wrapper PagSeguro.
-- [Fix] Em "**doAsyncPayment**", "**asyncVoidPayment**" e "**asyncInitPinPad**", removido "_disposeSubscriber_" dos eventos de progresso (cancelava a operação antes do resultado final).
-- [Fix] Em "**TransactionDataModel**", campos "_isDcc_", "_foreignAmount_", "_currencyDestinyLabel_", "_currencyOriginLabel_" e "_minorUnitsForeign_" agora enviados pelo Android.
-- [Improve] Tratamento de qualquer "_Exception_" (e não só "_PlugPagException_") em "**rebootDevice**", "**setStyleData**", "**asyncSetStyles**", "**sendReceiptSMS**" e "**setPlugPagCustomPrinterLayout**".
+- [Improve] "_ResultHelper_" (Android): chamadas novas respondem ao Flutter e logam só sucesso/mensagem (sem dados pessoais).
+- [Fix] "**PagSeguroEnum**": "_tPreAuthCard_" (7 => 6), "_tQrCodeCredit_" (8 => 7), "_tPreAuthKeyed_" (9 => 8), como no Wrapper.
+- [Fix] "**doAsyncPayment**", "**asyncVoidPayment**" e "**asyncInitPinPad**": removido "_disposeSubscriber_" do progresso
+  (cancelava a operação antes do resultado final).
+- [Fix] "**TransactionDataModel**": campos "_isDcc_", "_foreignAmount_", "_currencyDestinyLabel_", "_currencyOriginLabel_" e
+  "_minorUnitsForeign_" agora enviados pelo Android.
+- [Improve] Qualquer "_Exception_" (não só "_PlugPagException_") tratada em "**rebootDevice**", "**setStyleData**", "**asyncSetStyles**",
+  "**sendReceiptSMS**" e "**setPlugPagCustomPrinterLayout**".
 - [Improve] Corrotinas do plugin com "_SupervisorJob_" e tratador de exceção (falha em uma tarefa não cancela as demais).
 - [Improve] "_abortRequested_" com "_@Volatile_" (acesso seguro entre threads).
 - [Improve] Atualizado teste e adicionado teste dos códigos de tipos de pagamento.
 - [Upgrade] Migrado para "_Built-in Kotlin_" (AGP 9+), sem aplicar o Kotlin Gradle Plugin (KGP) quando o App usa Built-in Kotlin.
-- [Improve] Em "**android/build.gradle**", o KGP continua sendo aplicado automaticamente quando o App não usa "_Built-in Kotlin_" ("_android.builtInKotlin=false_").
+- [Improve] "**android/build.gradle**": KGP aplicado automaticamente se o App não usa "_Built-in Kotlin_" ("_android.builtInKotlin=false_").
 - [Improve] Em "**android/build.gradle**", "_kotlinOptions_" substituído por "_kotlin.compilerOptions_" (com fallback para KGP 1.x).
 - [Remove] Classpath do Kotlin Gradle Plugin no "_buildscript_" do plugin (a versão do Kotlin agora é definida pelo App).
 - [Improve] "**beep**" e "**setLed**" com tempo limite de 20s e retorno "_1_" do TerminalLib tratado como sucesso (testado na GPOS780S).
-- [Fix] Chamadas com tempo limite em "**ResultHelper.runIO**": interrupção do Wrapper ("_lateinit property result..._") agora responde "_tempo esgotado_" em vez de erro enganoso.
-- [Fix] Em "**setPlugPagCustomPrinterLayout**" (Android), padrão de "_maxTimeShowPopup_" "~~_30_~~" => "_20_" (igual ao do Dart; unidade em segundos).
-- [Improve] Documentado em "**setPrintActionListener**" que a prioridade é perguntar > SMS > direto (para SMS ou direto enviar "_askReceipt: false_").
+- [Fix] "**ResultHelper.runIO**": interrupção do Wrapper ("_lateinit property result..._") responde "_tempo esgotado_".
+- [Fix] "**setPlugPagCustomPrinterLayout**" (Android): "_maxTimeShowPopup_" "~~_30_~~" => "_20_" (igual ao Dart; em segundos).
+- [Improve] "**setPrintActionListener**": documentada a prioridade perguntar > SMS > direto (SMS/direto enviam "_askReceipt: false_").
 - [Improve] Comentários explicativos em todo o código (Dart e Kotlin) e README atualizado para a 1.4.0.
 - [Improve] Em "**invalidateSubAcquirer**", variável renomeada para não esconder a função "_ok()_".
-- [Upgrade] Em "**android/build.gradle**", AGP do "_buildscript_" "~~_8.9.1_~~" => "_8.13.0_" (série 8.x de propósito: uma 9.x exigiria Gradle 9 e poderia quebrar Apps com Gradle 8.14).
-- [Fix] Versão mínima "~~_Flutter 3.0 / Dart 3.0_~~" => "_Flutter 3.27 / Dart 3.6_": o pacote usa "_Color.toARGB32()_", que não existe antes (quem estava abaixo não compilava).
-- [Improve] "**PaymentManager**" recebe o canal de progresso pelo construtor (antes variável estática, que podia vazar entre engines Flutter).
+- [Upgrade] "**android/build.gradle**": AGP do "_buildscript_" "~~_8.9.1_~~" => "_8.13.0_".
+- [Improve] AGP mantido na série 8.x de propósito (uma 9.x exigiria Gradle 9 e poderia quebrar Apps com Gradle 8.14).
+- [Fix] Versão mínima "~~_Flutter 3.0 / Dart 3.0_~~" => "_Flutter 3.27 / Dart 3.6_".
+- [Improve] Motivo: "_Color.toARGB32()_" não existe antes disso (quem estava abaixo não compilava).
+- [Improve] "**PaymentManager**" recebe o canal de progresso pelo construtor (antes estático, vazava entre engines Flutter).
 - [Improve] Validações de venda e estorno centralizadas (sem duplicação entre síncrono e assíncrono), com o mesmo comportamento.
 - [Fix] Em "**doPayment**" (síncrono), cancelamento pedido pelo App responde "_Pagamento Cancelado pelo Usuário!_", igual ao assíncrono.
 - [Fix] Em "**asyncGetLastTransaction**", um erro não zera mais o indicador de cancelamento de um pagamento em andamento.
 - [Remove] Variável estática sem uso "_plugPagChannel_" em "**ReceiptManager**".
 - [Improve] "_topics_" e "_issue_tracker_" no "**pubspec.yaml**" para o pub.dev.
 - [Add] "**setLogEnabled**": liga/desliga os logs informativos do plugin (padrão ligado; erros continuam registrados).
-- [Add] "**PagSeguroResult**" e extensão "_toPagSeguroResult()_": leitura tipada opcional do retorno (os métodos continuam devolvendo "_Map_").
+- [Add] "**PagSeguroResult**" e "_toPagSeguroResult()_": leitura tipada opcional do retorno (métodos seguem devolvendo "_Map_").
 - [Improve] Classe "~~_Constants_~~" => "_PagSeguroConstants_" (nome antigo mantido como obsoleto até a 2.0, sem quebrar quem usa).
 - [Improve] README: aviso de LGPD sobre os logs do próprio Wrapper da PagSeguro e como desligar os logs do plugin.
 - [Improve] Testes de "**PagSeguroResult**", "**setLogEnabled**" e da compatibilidade de "_Constants_" (21 testes no total).

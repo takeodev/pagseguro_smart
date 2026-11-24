@@ -2,19 +2,22 @@
 
 ## 1.1.1
 
+- [Improve] Ícone do App: logo maior (borda transparente do "_app_icon_foreground.png_" recortada).
+- [Improve] Ícone do App: margem adaptativa "~~_16%_~~" => "_2%_" ("_adaptive_icon_foreground_inset_").
 - [Add] Nova aba "_Recursos_" com Dispositivo, Parcelamento, Impressão de Cupom, Leitura de Cartão e Subadquirente.
-- [Add] Opção "_Modo Assíncrono_" na aba "Comandos" para testar os métodos assíncronos (autenticação, ativação, pagamento, cancelamento, estorno e última transação).
+- [Add] Opção "_Modo Assíncrono_" na aba "Comandos" para testar os métodos assíncronos (autenticação até última transação).
 - [Add] Tour guiado pelo App (botão flutuante "_Tour guiado_"): esmaece a tela, destaca cada bloco e botão das 3 abas e explica o que fazem.
 - [Add] No Tour, passo-resumo por bloco com a lista de botões e opção "_Pular bloco_".
 - [Add] Botão "_Imprimir Cupom_" (antes "Imprimir Imagem"): imprime um cupom eletrônico de mercado fictício com "**printFromFile**".
-- [Improve] Janelas da aba "_Recursos_" explicam o recurso ("_O que é_"), mostram a "_Leitura_" das parcelas em R$ e seguem o padrão de janela inferior da aba "_Comandos_".
+- [Improve] Janelas da aba "_Recursos_": explicam o recurso ("_O que é_"), mostram a "_Leitura_" das parcelas em R$ e seguem o
+  padrão de janela inferior da aba "_Comandos_".
 - [Add] Componente "_ScrollHintBox_": barra de rolagem visível e aviso "_Role para ver mais_" em janelas com conteúdo longo.
 - [Improve] Explicação do "_Modo Assíncrono_": vantagens de cada modo e quando usar.
 - [Add] Splash Screen animada com o logotipo do desenvolvedor (fade, zoom e brilho) no lugar da tela padrão do Flutter; toque para pular.
 - [Add] Tela de abertura nativa (Android 12+) com fundo branco e o ícone do App, sem o logotipo do Flutter.
 - [Upgrade] Ícone do App com o logotipo do desenvolvedor (ícone adaptativo gerado por "**flutter_launcher_icons**").
 - [Add] Botão flutuante "_Sobre_" abre janela com créditos, links (site, pub.dev e GitHub) e pedido de apoio.
-- [Fix] Botões "_Via SMS_" e "_Direto_" não funcionavam (o "_Perguntar_" continuava ligado e vence no Android): agora enviam "_askReceipt: false_".
+- [Fix] Botões "_Via SMS_" e "_Direto_" não funcionavam ("_Perguntar_" vencia no Android): agora enviam "_askReceipt: false_".
 - [Fix] Botão "_Sem Recibo_" agora habilitado também com "_Direto_" ligado.
 - [Fix] Estado dos botões de recibo só muda quando o plugin confirma o sucesso.
 - [Improve] Campo "_Código_" de ativação começa vazio (removido o código padrão; cada desenvolvedor usa o seu, solicitado à PagSeguro).
@@ -40,7 +43,7 @@
 ## 1.0.10
 
 - [Add] Utilização de Layout "_pagSeguro_".
-- [Add] Em "**PaymentProvider**" nova função "_setFullStyleData_" unindo ambas pré-existentes "_setStyleData_" e "_setPlugPagCustomPrinterLayout_".
+- [Add] "**PaymentProvider**": "_setFullStyleData_" une "_setStyleData_" e "_setPlugPagCustomPrinterLayout_".
 
 ## 1.0.9
 

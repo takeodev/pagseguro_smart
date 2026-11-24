@@ -59,6 +59,15 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
         ) {
             val transactionId = transactionResult?.transactionId
             logger.info("printListener (onPrint)", "Interceptando Impressão de Recibo | Id: $transactionId")
+            // Diagnóstico sem dados pessoais (LGPD): só presença/ausência dos campos, nunca os valores de telefone/cartão.
+            // "conexão" = PlugPag.paymentConnection, por onde o Wrapper envia a ação escolhida abaixo; nula = ação perdida.
+            logger.info(
+                "printListener (onPrint, diagnóstico)",
+                "result: ${transactionResult?.result} | errorCode: ${transactionResult?.errorCode} | " +
+                    "transactionCode: ${!transactionResult?.transactionCode.isNullOrBlank()} | transactionId: ${!transactionId.isNullOrBlank()} | " +
+                    "tipo: ${transactionResult?.typeTransaction} | telefone: ${!phoneNumber.isNullOrBlank()} | " +
+                    "onFinishActions: ${onFinishActions != null} | conexão: ${plugPag.paymentConnection != null} | thread: ${Thread.currentThread().name}"
+            )
             logger.info("printListener (onPrint)", "askReceipt: ${this@ReceiptManager.askReceipt} | smsReceipt: ${this@ReceiptManager.smsReceipt} | directReceipt: ${this@ReceiptManager.directReceipt}")
 
             when {
@@ -381,6 +390,22 @@ class ReceiptManager(private val plugPag: PlugPag, private val scope: CoroutineS
                     logger.error("reapplyPrintActionListener (Exception)", "Erro ao Reaplicar Configuração de Recibo do Cliente: ${e.message}")
                 }
             }
+        }
+    }
+
+    /**
+     * Versão bloqueante de [reapplyPrintActionListener], para uso em thread de IO logo antes de um estorno.
+     * O registro do ouvinte no serviço PagBank vale para uma operação: a venda anterior o consome (testado na GPOS780S: o
+     * estorno seguinte não chamava o `onPrint` e o serviço abria o popup padrão, esperando ~15 s). Reaplicar antes do estorno
+     * garante que a ação configurada seja usada. Não faz nada se `setPrintActionListener` nunca foi chamado.
+     **/
+    fun reapplyPrintActionListenerBlocking() {
+        if (!this.changedReceipt) return
+        try {
+            val actionResult: PlugPagPrintActionResult = plugPag.setPrintActionListener(printListener)
+            logger.info("reapplyPrintActionListenerBlocking", "Configuração de Recibo reaplicada antes do estorno | Code: ${actionResult.result}")
+        } catch (e: Exception) {
+            logger.error("reapplyPrintActionListenerBlocking (Exception)", "Erro ao reaplicar Configuração de Recibo: ${e.message}")
         }
     }
 

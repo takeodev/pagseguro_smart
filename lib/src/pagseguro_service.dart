@@ -24,6 +24,17 @@ class PagSeguroService {
   /// o App pode abortar a transação naquele momento (`canAbort`).
   void Function(String message, bool canAbort)? onPaymentProgress;
 
+  /// Mesmo evento de [onPaymentProgress], com o código numérico do Wrapper (`PlugPagEventData.eventCode`). - 1.4.1
+  /// Permite agir pelo estado sem depender do texto (ex.: [PagSeguroConstants.eventSaleApproved] = transação autorizada).
+  /// Chamado logo depois de [onPaymentProgress]; `eventCode` é `-1` quando o Android não o informa.
+  void Function(int eventCode, String message, bool canAbort)? onPaymentEvent;
+
+  /// Mensagem devolvida quando uma chamada com `timeout` não recebe resposta a tempo
+  static const String timeoutMessage = 'Sem Resposta do Serviço PagSeguro (tempo esgotado)!';
+
+  /// Valor interno que marca o tempo esgotado em [_invokeNative]
+  static final Object _timeoutMarker = Object();
+
   /// Último estado de permissão de cancelamento, decidido por [_abortPermission]
   bool _canAbort = false;
 
@@ -43,6 +54,8 @@ class PagSeguroService {
         final message = (data['message'] ?? '').toString();
         final newCanAbort = _abortPermission(message);
         onPaymentProgress?.call(message, newCanAbort);
+        final code = data['eventCode'];
+        onPaymentEvent?.call(code is int ? code : -1, message, newCanAbort);
         break;
     }
   }
@@ -85,9 +98,13 @@ class PagSeguroService {
   /// Função para execução nativa com retorno e tratativa de erro.
   /// Sempre devolve `{success, message, data}`: se o Kotlin não enviar `success`, assume `false`.
   /// Em erro de canal, `message` recebe o texto do erro e `data` fica `null`.
-  Future<Map<String, dynamic>> _invokeNative(String method, [Map<String, dynamic>? arguments]) async {
+  /// Com [timeout], se o Android não responder a tempo devolve `success: false` com [timeoutMessage] (o serviço PagBank
+  /// pode travar e nunca responder). A chamada nativa continua rodando; a resposta que chegar depois é ignorada.
+  Future<Map<String, dynamic>> _invokeNative(String method, [Map<String, dynamic>? arguments, Duration? timeout]) async {
     try {
-      final result = await _methodChannel.invokeMethod(method, arguments);
+      final call = _methodChannel.invokeMethod(method, arguments);
+      final result = timeout == null ? await call : await call.timeout(timeout, onTimeout: () => _timeoutMarker);
+      if (identical(result, _timeoutMarker)) return {'success': false, 'message': timeoutMessage, 'data': null};
       final map = result is Map ? Map<String, dynamic>.from(result) : {};
 
       return {'success': map['success'] ?? false, 'message': map['message'] ?? '', 'data': map['data']};
@@ -106,9 +123,13 @@ class PagSeguroService {
   /// Obs.: os logs do próprio Wrapper da PagSeguro não são controlados pelo plugin.
   Future<Map<String, dynamic>> setLogEnabled(bool enabled) => _invokeNative('setLogEnabled', {'enabled': enabled});
 
+  // [timeout] (opcional, 1.4.1) nas consultas abaixo: sem ele nada muda; com ele, se o serviço PagBank travar e não
+  // responder, devolve `{success: false, message: timeoutMessage}` em vez de deixar o Future pendurado. Não existe em
+  // pagamento nem em estorno de propósito: lá o tempo é do cliente e cortar a espera esconderia uma transação aprovada.
+
   /// Verifica se PinPad está Ativo. data: não usado. Falha se o PinPad não estiver ativado.
-  Future<Map<String, dynamic>> isAuthenticated() => _invokeNative('isAuthenticated');
-  Future<Map<String, dynamic>> asyncIsAuthenticated() => _invokeNative('asyncIsAuthenticated');
+  Future<Map<String, dynamic>> isAuthenticated({Duration? timeout}) => _invokeNative('isAuthenticated', null, timeout);
+  Future<Map<String, dynamic>> asyncIsAuthenticated({Duration? timeout}) => _invokeNative('asyncIsAuthenticated', null, timeout);
 
   /// Inicializa (ativa) o PinPad com o código de ativação fornecido pelo PagSeguro.
   /// Retorna `success: true` quando a ativação termina sem erro; caso contrário, `message` traz o motivo.
@@ -204,6 +225,8 @@ class PagSeguroService {
   /// Realiza o estorno de uma transação anterior.
   /// [transactionCode] e [transactionId] identificam a transação original (vêm do retorno de um pagamento
   /// ou de [getLastTransaction]). [voidType]: `vCommon` (estorno padrão) ou `vQrCode`.
+  /// Desde a 1.4.1 a ação de recibo de [setPrintActionListener] também é entregue no estorno (antes o Wrapper a perdia e
+  /// o resultado só chegava após ~120 s, com "PP1064 - Tempo limite expirado").
   Future<Map<String, dynamic>> voidPayment({
     required String transactionCode,
     required String transactionId,
@@ -230,20 +253,20 @@ class PagSeguroService {
       });
 
   /// Pega os Dados da Última Transação (Pode ser Estorno ou Pagamento)
-  Future<Map<String, dynamic>> getLastTransaction() => _invokeNative('getLastTransaction');
-  Future<Map<String, dynamic>> asyncGetLastTransaction() => _invokeNative('asyncGetLastTransaction');
+  Future<Map<String, dynamic>> getLastTransaction({Duration? timeout}) => _invokeNative('getLastTransaction', null, timeout);
+  Future<Map<String, dynamic>> asyncGetLastTransaction({Duration? timeout}) => _invokeNative('asyncGetLastTransaction', null, timeout);
 
   /// Coleta dados do Dono da Maquininha. Atenção LGPD: são dados pessoais, não registre em logs nem os exiba sem necessidade.
-  Future<Map<String, dynamic>> getUserData() => _invokeNative('getUserData');
+  Future<Map<String, dynamic>> getUserData({Duration? timeout}) => _invokeNative('getUserData', null, timeout);
 
   /// Coleta Número de Série da Maquininha
-  Future<Map<String, dynamic>> getSerialNumber() => _invokeNative('getSerialNumber');
+  Future<Map<String, dynamic>> getSerialNumber({Duration? timeout}) => _invokeNative('getSerialNumber', null, timeout);
 
   /// Reinicia a Maquininha
   Future<Map<String, dynamic>> rebootDevice() => _invokeNative('rebootDevice');
 
   /// Verifica se o Serviço da PagSeguro está Livre
-  Future<Map<String, dynamic>> isServiceBusy() => _invokeNative('isServiceBusy');
+  Future<Map<String, dynamic>> isServiceBusy({Duration? timeout}) => _invokeNative('isServiceBusy', null, timeout);
 
   /// Reimpressão de Recibo: Via do Cliente
   Future<Map<String, dynamic>> reprintCustomerReceipt() => _invokeNative('reprintCustomerReceipt');

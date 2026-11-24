@@ -23,6 +23,7 @@ import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagVoidData
 import br.com.uol.pagseguro.plugpagservice.wrapper.PlugPagEventListener
 import com.takeodev.pagseguro_smart.utils.Logger
 import com.takeodev.pagseguro_smart.utils.CoroutineHelper
+import com.takeodev.pagseguro_smart.utils.VoidReceiptBridge
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -38,7 +39,9 @@ class PaymentManager(
     private val receiptManager: ReceiptManager,
     /** Canal do plugin, usado para enviar o progresso (onPaymentProgress) ao Flutter. Recebido pelo construtor
      *  (e não por variável estática) para não vazar entre engines Flutter nem depois do detach. */
-    private val channel: MethodChannel
+    private val channel: MethodChannel,
+    /** Correção do recibo no estorno (ver [VoidReceiptBridge]); usada só no voidPayment e no asyncVoidPayment */
+    private val voidReceiptBridge: VoidReceiptBridge
 ) {
 
     companion object {
@@ -396,10 +399,23 @@ class PaymentManager(
 
         val voidData = buildVoidData(call, result) ?: return
 
+        // Progresso do estorno também vai ao Dart (sem isso, só chegava se uma venda tivesse registrado o listener antes)
+        plugPag.setEventListener(object : PlugPagEventListener {
+            override fun onEvent(data: PlugPagEventData) = sendProgress("voidPayment (onEvent)", data.eventCode, data.customMessage)
+        })
+
         // Execução Síncrona → fora da main thread
         CoroutineHelper.launchIO(scope) {
+            // O ouvinte de recibo vale para uma operação (a venda anterior o consome): reaplica antes do estorno
+            receiptManager.reapplyPrintActionListenerBlocking()
+            // Correção do recibo: sem ela o Wrapper descarta a ação do onPrint e o estorno espera 120 s (PP1064)
+            val receiptSession = voidReceiptBridge.open()
             try {
-                val transactionResult = plugPag.voidPayment(voidData)
+                val transactionResult = try {
+                    plugPag.voidPayment(voidData)
+                } finally {
+                    receiptSession.close()
+                }
 
                 CoroutineHelper.launchMain(scope) {
                     val map = transactionResult.toMap()
@@ -454,10 +470,19 @@ class PaymentManager(
     fun asyncVoidPayment(call: MethodCall, result: MethodChannel.Result) {
         logger.info("PlugPag Instance (asyncVoidPayment)", plugPag.hashCode().toString())
 
+        var receiptSession: VoidReceiptBridge.Session? = null
+
         try {
             abortRequested = false
 
             val voidData = buildVoidData(call, result) ?: return
+
+            // O ouvinte de recibo vale para uma operação (a venda anterior o consome): reaplica antes do estorno
+            receiptManager.reapplyPrintActionListener()
+
+            // Correção do recibo (ver voidPayment). Fechada no resultado final, no erro ou na exceção.
+            val session = voidReceiptBridge.open()
+            receiptSession = session
 
             plugPag.doAsyncVoidPayment(voidData, object : PlugPagPaymentListener {
                 // IMPORTANTE: não chamar disposeSubscriber() no progresso. Ele cancela a operação em andamento
@@ -466,6 +491,7 @@ class PaymentManager(
                     sendProgress("asyncVoidPayment (onPaymentProgress)", eventData.eventCode, eventData.customMessage)
 
                 override fun onSuccess(transactionResult: PlugPagTransactionResult) {
+                    session.close()
                     CoroutineHelper.launchMain(scope) {
                         val map = transactionResult.toMap()
                         logger.info("asyncVoidPayment (onSuccess)", "Estorno Realizado | Id: ${transactionResult.transactionId}")
@@ -479,6 +505,7 @@ class PaymentManager(
                 }
 
                 override fun onError(transactionResult: PlugPagTransactionResult) {
+                    session.close()
                     CoroutineHelper.launchMain(scope) {
                         val map = transactionResult.toMap()
                         if (abortRequested) {
@@ -515,6 +542,7 @@ class PaymentManager(
                 }
             })
         } catch (e: Exception) {
+            receiptSession?.close()
             CoroutineHelper.launchMain(scope) {
                 logger.error("asyncVoidPayment (Exception)", "Erro ao Realizar Estorno: ${e.message}")
                 result.success(mapOf(

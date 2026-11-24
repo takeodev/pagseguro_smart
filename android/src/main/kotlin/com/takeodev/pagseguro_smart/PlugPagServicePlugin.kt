@@ -23,6 +23,7 @@ import com.takeodev.pagseguro_smart.manager.PaymentManager
 import com.takeodev.pagseguro_smart.manager.ReceiptManager
 import com.takeodev.pagseguro_smart.manager.DeviceManager
 import com.takeodev.pagseguro_smart.utils.Logger
+import com.takeodev.pagseguro_smart.utils.VoidReceiptBridge
 
 /**
  * Classe principal do plugin PagSeguro Smart para Flutter.
@@ -69,7 +70,7 @@ class PlugPagServicePlugin : FlutterPlugin, MethodChannel.MethodCallHandler {
         pinPadManager = PinPadManager(plugPag, pluginScope)
         receiptManager = ReceiptManager(plugPag, pluginScope)
         // O PaymentManager recebe o canal para enviar eventos ao Dart (ex.: onPaymentProgress)
-        paymentManager = PaymentManager(plugPag, pluginScope, receiptManager, channel)
+        paymentManager = PaymentManager(plugPag, pluginScope, receiptManager, channel, VoidReceiptBridge(context, plugPag))
         deviceManager = DeviceManager(plugPag, pluginScope)
     }
 
